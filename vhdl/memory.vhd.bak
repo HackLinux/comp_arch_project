@@ -1,0 +1,157 @@
+ca--************************************************
+-- file			: memory.vhd
+-- source		: ECSE 487 course website
+-- modified by : harsh aurora
+-- date			: 26 jan 2015
+--
+-- brief	   	: Adapted from Example 12-15 of  
+--            	  Quartus Design and Synthesis
+--               handbook
+--************************************************
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.params.all;
+
+
+entity memory is
+	port	(	clk				: in  std_logic;
+				s_writedata		: in  std_logic_vector (word_length-1 downto 0);
+				s_address		: in  std_logic_vector(r-1 downto 0);
+				s_memwrite		: in  std_logic;
+				s_memread		: in  std_logic;
+				s_readdata		: out std_logic_vector (word_length-1 downto 0);
+				s_waitrequest	: out std_logic
+			);
+end memory;
+
+architecture rtl of memory is
+
+	type state is (init, idle, busy);
+	
+	type MEM is array(ram_size-1 downto 0) of std_logic_vector(word_length-1 downto 0);
+	
+	signal ram_block: MEM;
+	
+	signal current	: state := init;
+	signal nxt		: state := init;
+	
+	signal init_done		: std_logic := '0';
+	
+	signal writedata		: std_logic_vector (word_length-1 downto 0);
+	signal address			: integer range 0 to ram_size-1 := 0;
+	signal memwrite		: std_logic;
+	
+	signal init_addr		: integer range 0 to ram_size-1 := 0;
+	signal mem_delay		: integer := 0;
+	signal address_reg	: integer range 0 to ram_size-1 := 0;
+
+	
+begin
+	
+	counters:
+		process(clk)
+		begin
+			if(rising_edge(clk)) then
+				if(current = init) then
+					init_addr <= init_addr + 1;
+				else
+					init_addr <= 0;
+				end if;
+				
+				if (current = busy) then
+					mem_delay <= mem_delay + 1;
+				else
+					mem_delay <= 0;
+				end if;
+			end if;
+		end process counters;
+	
+	-- state register
+	state_transition:
+		process(clk)
+		begin
+			if(rising_edge(clk)) then
+				current <= nxt;
+			end if;
+		end process state_transition;
+	
+	-- next state assignment 
+	state_assignment:
+		process(current, init_done)
+		begin
+			case current is
+				
+				when init =>
+					if(init_done = '1') then
+						nxt <= idle;
+					else
+						nxt <= init;
+					end if;
+			
+				when idle =>
+					if((s_memread xor s_memwrite) = '1') then -- there can be only one
+						nxt <= busy;
+					else
+						nxt <= idle;
+					end if;
+				
+				when busy =>
+					
+					if(mem_delay = mem_delay_cycles) then
+						nxt <= idle;
+					else
+						nxt <= busy;
+					end if;
+				
+			end case;
+		end process state_assignment;
+	
+	output_assignments:
+		process(current, mem_delay)
+		begin
+			case current is
+				when init =>
+					memwrite <= '1';
+					writedata <= std_logic_vector(to_unsigned(init_addr, word_length));
+					address <= init_addr;
+					s_waitrequest <= '1';
+					
+				when idle =>
+					memwrite <= '0';
+					writedata <= (others => '0');
+					address <= 0;
+					s_waitrequest <= '1';
+				
+				when busy =>
+					writedata <= s_writedata;
+					address <= to_integer(unsigned(s_address));
+					if(mem_delay = mem_delay_cycles) then
+						memwrite <= s_memwrite;
+						s_waitrequest <= '0';
+					else
+						memwrite <= '0';
+						s_waitrequest <= '1';
+					end if;
+			
+			end case;
+		
+		end process output_assignments;
+	
+	--This is the main section of the SRAM model
+	mem_process: process (clk)
+	begin
+		--This is the actual synthesizable SRAM block
+		if (rising_edge(clk)) then
+			if (memwrite = '1') then
+				ram_block(address) <= writedata;
+			end if;
+		address_reg <= to_integer(unsigned(s_address));
+		end if;
+	end process;
+	
+	s_readdata <= ram_block(address_reg);
+	
+	init_done <= '1' when init_addr = (ram_size-1) else '0';
+	
+end rtl;
