@@ -15,13 +15,21 @@ entity toplevel is
 	port	(	clk				: in  std_logic;
 				rst				: in 	std_logic;
 				
-				-- I/O interface for the FSM/Processor
-				m_writedata		: in  std_logic_vector (word_length-1 downto 0);
-				m_address		: in  std_logic_vector(r-1 downto 0);
-				m_memwrite		: in  std_logic;
-				m_memread		: in  std_logic;
-				m_readdata		: out std_logic_vector (word_length-1 downto 0);
-				m_waitrequest	: out std_logic
+				-- I/O interface for the matched processor
+				m_matched_writedata		: in  std_logic_vector (word_length-1 downto 0);
+				m_matched_address		: in  std_logic_vector(r-1 downto 0);
+				m_matched_memwrite		: in  std_logic;
+				m_matched_memread		: in  std_logic;
+				m_matched_readdata		: out std_logic_vector (word_length-1 downto 0);
+				m_matched_waitrequest	: out std_logic;
+				
+				-- I/O interface for the opposite processor
+				m_opposite_writedata		: in  std_logic_vector (word_length-1 downto 0);
+				m_opposite_address		: in  std_logic_vector(r-1 downto 0);
+				m_opposite_memwrite		: in  std_logic;
+				m_opposite_memread		: in  std_logic;
+				m_opposite_readdata		: out std_logic_vector (word_length-1 downto 0);
+				m_opposite_waitrequest	: out std_logic
 				
 				-- I/O interface for memory
 --				s_writedata		: out std_logic_vector (word_length-1 downto 0);
@@ -51,13 +59,21 @@ architecture structural of toplevel is
 		port	(	clk				: in  std_logic;
 					rst				: in  std_logic;
 					
-					-- I/O interface for the FSM/Processor
-					m_writedata		: in  std_logic_vector (word_length-1 downto 0);
-					m_address		: in  std_logic_vector(r-1 downto 0);
-					m_memwrite		: in  std_logic;
-					m_memread		: in  std_logic;
-					m_readdata		: out std_logic_vector (word_length-1 downto 0);
-					m_waitrequest	: out std_logic;
+					-- I/O interface for the matched processor
+					m_matched_writedata		: in  std_logic_vector (word_length-1 downto 0);
+					m_matched_address		: in  std_logic_vector(r-1 downto 0);
+					m_matched_memwrite		: in  std_logic;
+					m_matched_memread		: in  std_logic;
+					m_matched_readdata		: out std_logic_vector (word_length-1 downto 0);
+					m_matched_waitrequest	: out std_logic;
+					
+					-- I/O interface for the opposite processor
+					m_opposite_writedata		: in  std_logic_vector (word_length-1 downto 0);
+					m_opposite_address		: in  std_logic_vector(r-1 downto 0);
+					m_opposite_memwrite		: in  std_logic;
+					m_opposite_memread		: in  std_logic;
+					m_opposite_readdata		: out std_logic_vector (word_length-1 downto 0);
+					m_opposite_waitrequest	: out std_logic;
 					
 					-- I/O interface for memory
 					s_writedata		: out std_logic_vector (word_length-1 downto 0);
@@ -79,6 +95,6 @@ architecture structural of toplevel is
 begin
 
 	xmemory: memory port map(clk,s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
-	xcache : cache port map(clk, rst, m_writedata, m_address, m_memwrite, m_memread, m_readdata, m_waitrequest, s_writedata, s_address, s_memwrite, s_memread, s_readdata, s_waitrequest);
+	xcache : cache port map(clk, rst, m_matched_writedata, m_matched_address, m_matched_memwrite, m_matched_memread, m_matched_readdata, m_matched_waitrequest, m_opposite_writedata, m_opposite_address, m_opposite_memwrite, m_opposite_memread, m_opposite_readdata, m_opposite_waitrequest, s_writedata, s_address, s_memwrite, s_memread, s_readdata, s_waitrequest);
 
 end structural;

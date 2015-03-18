@@ -1,6 +1,6 @@
 Analysis & Synthesis report for Project
-Sun Mar 01 04:05:11 2015
-Quartus II 64-Bit Version 14.1.0 Build 186 12/03/2014 SJ Web Edition
+Wed Mar 18 12:22:04 2015
+Quartus II 64-Bit Version 13.1.0 Build 162 10/23/2013 SJ Web Edition
 
 
 ---------------------
@@ -9,61 +9,57 @@ Quartus II 64-Bit Version 14.1.0 Build 186 12/03/2014 SJ Web Edition
   1. Legal Notice
   2. Analysis & Synthesis Summary
   3. Analysis & Synthesis Settings
-  4. Parallel Compilation
-  5. Analysis & Synthesis Source Files Read
-  6. Analysis & Synthesis Resource Usage Summary
-  7. Analysis & Synthesis Resource Utilization by Entity
-  8. Analysis & Synthesis RAM Summary
-  9. State Machine - |toplevel|cache:xcache|current
- 10. State Machine - |toplevel|memory:xmemory|current
- 11. Registers Removed During Synthesis
- 12. General Register Statistics
- 13. Inverted Register Statistics
- 14. Registers Packed Into Inferred Megafunctions
- 15. Multiplexer Restructuring Statistics (Restructuring Performed)
- 16. Source assignments for memory:xmemory|ram:xram|altsyncram:memory_rtl_0|altsyncram_op41:auto_generated
- 17. Parameter Settings for Inferred Entity Instance: memory:xmemory|ram:xram|altsyncram:memory_rtl_0
- 18. altsyncram Parameter Settings by Entity Instance
- 19. Port Connectivity Checks: "memory:xmemory"
- 20. Post-Synthesis Netlist Statistics for Top Partition
- 21. Elapsed Time Per Partition
- 22. Analysis & Synthesis Messages
+  4. Analysis & Synthesis Source Files Read
+  5. Analysis & Synthesis Resource Usage Summary
+  6. Analysis & Synthesis Resource Utilization by Entity
+  7. Analysis & Synthesis RAM Summary
+  8. State Machine - |toplevel|cache:xcache|current
+  9. State Machine - |toplevel|memory:xmemory|current
+ 10. General Register Statistics
+ 11. Inverted Register Statistics
+ 12. Registers Packed Into Inferred Megafunctions
+ 13. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 14. Source assignments for memory:xmemory|ram:xram|altsyncram:memory_rtl_0|altsyncram_op41:auto_generated
+ 15. Parameter Settings for Inferred Entity Instance: memory:xmemory|ram:xram|altsyncram:memory_rtl_0
+ 16. altsyncram Parameter Settings by Entity Instance
+ 17. Port Connectivity Checks: "memory:xmemory"
+ 18. Elapsed Time Per Partition
+ 19. Analysis & Synthesis Messages
 
 
 
 ----------------
 ; Legal Notice ;
 ----------------
-Copyright (C) 1991-2014 Altera Corporation. All rights reserved.
+Copyright (C) 1991-2013 Altera Corporation
 Your use of Altera Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
 (including device programming or simulation files), and any 
 associated documentation or information are expressly subject 
 to the terms and conditions of the Altera Program License 
-Subscription Agreement, the Altera Quartus II License Agreement,
-the Altera MegaCore Function License Agreement, or other 
-applicable license agreement, including, without limitation, 
-that your use is for the sole purpose of programming logic 
-devices manufactured by Altera and sold by Altera or its 
-authorized distributors.  Please refer to the applicable 
-agreement for further details.
+Subscription Agreement, Altera MegaCore Function License 
+Agreement, or other applicable license agreement, including, 
+without limitation, that your use is for the sole purpose of 
+programming logic devices manufactured by Altera and sold by 
+Altera or its authorized distributors.  Please refer to the 
+applicable agreement for further details.
 
 
 
 +---------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                    ;
 +------------------------------------+--------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Sun Mar 01 04:05:10 2015      ;
-; Quartus II 64-Bit Version          ; 14.1.0 Build 186 12/03/2014 SJ Web Edition ;
+; Analysis & Synthesis Status        ; Successful - Wed Mar 18 12:22:03 2015      ;
+; Quartus II 64-Bit Version          ; 13.1.0 Build 162 10/23/2013 SJ Web Edition ;
 ; Revision Name                      ; Project                                    ;
 ; Top-level Entity Name              ; toplevel                                   ;
 ; Family                             ; Cyclone IV GX                              ;
-; Total logic elements               ; 32,668                                     ;
-;     Total combinational functions  ; 14,787                                     ;
+; Total logic elements               ; 32,677                                     ;
+;     Total combinational functions  ; 14,796                                     ;
 ;     Dedicated logic registers      ; 18,013                                     ;
 ; Total registers                    ; 18013                                      ;
-; Total pins                         ; 88                                         ;
+; Total pins                         ; 174                                        ;
 ; Total virtual pins                 ; 0                                          ;
 ; Total memory bits                  ; 16,777,216                                 ;
 ; Embedded Multiplier 9-bit elements ; 0                                          ;
@@ -141,7 +137,7 @@ agreement for further details.
 ; Report Connectivity Checks                                                 ; On                 ; On                 ;
 ; Ignore Maximum Fan-Out Assignments                                         ; Off                ; Off                ;
 ; Synchronization Register Chain Length                                      ; 2                  ; 2                  ;
-; PowerPlay Power Optimization During Synthesis                              ; Normal compilation ; Normal compilation ;
+; PowerPlay Power Optimization                                               ; Normal compilation ; Normal compilation ;
 ; HDL message level                                                          ; Level2             ; Level2             ;
 ; Suppress Register Optimization Related Messages                            ; Off                ; Off                ;
 ; Number of Removed Registers Reported in Synthesis Report                   ; 5000               ; 5000               ;
@@ -161,49 +157,31 @@ agreement for further details.
 +----------------------------------------------------------------------------+--------------------+--------------------+
 
 
-+------------------------------------------+
-; Parallel Compilation                     ;
-+----------------------------+-------------+
-; Processors                 ; Number      ;
-+----------------------------+-------------+
-; Number detected on machine ; 8           ;
-; Maximum allowed            ; 4           ;
-;                            ;             ;
-; Average used               ; 1.04        ;
-; Maximum used               ; 4           ;
-;                            ;             ;
-; Usage by Processor         ; % Time Used ;
-;     Processor 1            ; 100.0%      ;
-;     Processors 2-4         ;   1.5%      ;
-;     Processors 5-8         ;   0.0%      ;
-+----------------------------+-------------+
-
-
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Source Files Read                                                                                                                             ;
-+----------------------------------+-----------------+------------------------------+----------------------------------------------------------------------+---------+
-; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                         ; Library ;
-+----------------------------------+-----------------+------------------------------+----------------------------------------------------------------------+---------+
-; vhdl/toplevel.vhd                ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/toplevel.vhd                              ;         ;
-; vhdl/ram.vhd                     ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/ram.vhd                                   ;         ;
-; vhdl/params.vhd                  ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/params.vhd                                ;         ;
-; vhdl/memory.vhd                  ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/memory.vhd                                ;         ;
-; vhdl/cache_set.vhd               ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/cache_set.vhd                             ;         ;
-; vhdl/cache.vhd                   ; yes             ; User VHDL File               ; C:/altera/CAL/Project/vhdl/cache.vhd                                 ;         ;
-; altsyncram.tdf                   ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/altsyncram.tdf        ;         ;
-; stratix_ram_block.inc            ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/stratix_ram_block.inc ;         ;
-; lpm_mux.inc                      ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/lpm_mux.inc           ;         ;
-; lpm_decode.inc                   ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/lpm_decode.inc        ;         ;
-; aglobal141.inc                   ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/aglobal141.inc        ;         ;
-; a_rdenreg.inc                    ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/a_rdenreg.inc         ;         ;
-; altrom.inc                       ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/altrom.inc            ;         ;
-; altram.inc                       ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/altram.inc            ;         ;
-; altdpram.inc                     ; yes             ; Megafunction                 ; c:/altera/14.1/quartus/libraries/megafunctions/altdpram.inc          ;         ;
-; db/altsyncram_op41.tdf           ; yes             ; Auto-Generated Megafunction  ; C:/altera/CAL/Project/db/altsyncram_op41.tdf                         ;         ;
-; db/decode_a2b.tdf                ; yes             ; Auto-Generated Megafunction  ; C:/altera/CAL/Project/db/decode_a2b.tdf                              ;         ;
-; db/decode_3ea.tdf                ; yes             ; Auto-Generated Megafunction  ; C:/altera/CAL/Project/db/decode_3ea.tdf                              ;         ;
-; db/mux_7ub.tdf                   ; yes             ; Auto-Generated Megafunction  ; C:/altera/CAL/Project/db/mux_7ub.tdf                                 ;         ;
-+----------------------------------+-----------------+------------------------------+----------------------------------------------------------------------+---------+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                     ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                                 ; Library ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------------------------+---------+
+; vhdl/toplevel.vhd                ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/toplevel.vhd      ;         ;
+; vhdl/ram.vhd                     ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/ram.vhd           ;         ;
+; vhdl/params.vhd                  ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/params.vhd        ;         ;
+; vhdl/memory.vhd                  ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/memory.vhd        ;         ;
+; vhdl/cache_set.vhd               ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/cache_set.vhd     ;         ;
+; vhdl/cache.vhd                   ; yes             ; User VHDL File               ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/vhdl/cache.vhd         ;         ;
+; altsyncram.tdf                   ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/altsyncram.tdf                ;         ;
+; stratix_ram_block.inc            ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/stratix_ram_block.inc         ;         ;
+; lpm_mux.inc                      ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/lpm_mux.inc                   ;         ;
+; lpm_decode.inc                   ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/lpm_decode.inc                ;         ;
+; aglobal131.inc                   ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/aglobal131.inc                ;         ;
+; a_rdenreg.inc                    ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/a_rdenreg.inc                 ;         ;
+; altrom.inc                       ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/altrom.inc                    ;         ;
+; altram.inc                       ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/altram.inc                    ;         ;
+; altdpram.inc                     ; yes             ; Megafunction                 ; c:/altera/13.1/quartus/libraries/megafunctions/altdpram.inc                  ;         ;
+; db/altsyncram_op41.tdf           ; yes             ; Auto-Generated Megafunction  ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/db/altsyncram_op41.tdf ;         ;
+; db/decode_a2b.tdf                ; yes             ; Auto-Generated Megafunction  ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/db/decode_a2b.tdf      ;         ;
+; db/decode_3ea.tdf                ; yes             ; Auto-Generated Megafunction  ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/db/decode_3ea.tdf      ;         ;
+; db/mux_7ub.tdf                   ; yes             ; Auto-Generated Megafunction  ; C:/Users/lorenlugosch/Comp_arch_lab/comp_arch_project/db/mux_7ub.tdf         ;         ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------------------------+---------+
 
 
 +---------------------------------------------+
@@ -211,14 +189,12 @@ agreement for further details.
 +--------------------------+------------------+
 ; Resource                 ; Usage            ;
 +--------------------------+------------------+
-; I/O pins                 ; 88               ;
+; I/O pins                 ; 174              ;
 ; Total memory bits        ; 16777216         ;
-;                          ;                  ;
 ; DSP block 9-bit elements ; 0                ;
-;                          ;                  ;
 ; Maximum fan-out node     ; clk~input        ;
 ; Maximum fan-out          ; 20061            ;
-; Total fan-out            ; 147236           ;
+; Total fan-out            ; 147860           ;
 ; Average fan-out          ; 4.20             ;
 +--------------------------+------------------+
 
@@ -228,10 +204,10 @@ agreement for further details.
 +----------------------------------------------+-------------------+---------------+-------------+--------------+---------+-----------+-----------+------+--------------+-----------------------------------------------------------------------------------------------------------------+--------------+
 ; Compilation Hierarchy Node                   ; LC Combinationals ; LC Registers  ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; DSP 36x36 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                             ; Library Name ;
 +----------------------------------------------+-------------------+---------------+-------------+--------------+---------+-----------+-----------+------+--------------+-----------------------------------------------------------------------------------------------------------------+--------------+
-; |toplevel                                    ; 14787 (0)         ; 18013 (0)     ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 88   ; 0            ; |toplevel                                                                                                       ; work         ;
-;    |cache:xcache|                            ; 12739 (158)       ; 17951 (22)    ; 0           ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|cache:xcache                                                                                          ; work         ;
-;       |cache_set:xcache|                     ; 12581 (12581)     ; 17929 (17929) ; 0           ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|cache:xcache|cache_set:xcache                                                                         ; work         ;
-;    |memory:xmemory|                          ; 2048 (237)        ; 62 (56)       ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|memory:xmemory                                                                                        ; work         ;
+; |toplevel                                    ; 14796 (0)         ; 18013 (0)     ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 174  ; 0            ; |toplevel                                                                                                       ; work         ;
+;    |cache:xcache|                            ; 12758 (172)       ; 17951 (22)    ; 0           ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|cache:xcache                                                                                          ; work         ;
+;       |cache_set:xcache|                     ; 12586 (12586)     ; 17929 (17929) ; 0           ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|cache:xcache|cache_set:xcache                                                                         ; work         ;
+;    |memory:xmemory|                          ; 2038 (227)        ; 62 (56)       ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|memory:xmemory                                                                                        ; work         ;
 ;       |ram:xram|                             ; 1811 (0)          ; 6 (0)         ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|memory:xmemory|ram:xram                                                                               ; work         ;
 ;          |altsyncram:memory_rtl_0|           ; 1811 (0)          ; 6 (0)         ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|memory:xmemory|ram:xram|altsyncram:memory_rtl_0                                                       ; work         ;
 ;             |altsyncram_op41:auto_generated| ; 1811 (0)          ; 6 (6)         ; 16777216    ; 0            ; 0       ; 0         ; 0         ; 0    ; 0            ; |toplevel|memory:xmemory|ram:xram|altsyncram:memory_rtl_0|altsyncram_op41:auto_generated                        ; work         ;
@@ -281,16 +257,6 @@ Encoding Type:  One-Hot
 +---------------+--------------+--------------+--------------+---------------+
 
 
-+---------------------------------------------------------------------------------+
-; Registers Removed During Synthesis                                              ;
-+---------------------------------------+-----------------------------------------+
-; Register name                         ; Reason for Removal                      ;
-+---------------------------------------+-----------------------------------------+
-; cache:xcache|nds_waitrequest          ; Merged with cache:xcache|ds_waitrequest ;
-; Total Number of Removed Registers = 1 ;                                         ;
-+---------------------------------------+-----------------------------------------+
-
-
 +------------------------------------------------------+
 ; General Register Statistics                          ;
 +----------------------------------------------+-------+
@@ -313,7 +279,7 @@ Encoding Type:  One-Hot
 +----------------------------------------+---------+
 ; memory:xmemory|mem_delay[31]           ; 2       ;
 ; memory:xmemory|mem_delay[0]            ; 2       ;
-; cache:xcache|ds_waitrequest            ; 3       ;
+; cache:xcache|ds_waitrequest            ; 4       ;
 ; Total number of inverted registers = 3 ;         ;
 +----------------------------------------+---------+
 
@@ -333,14 +299,15 @@ Encoding Type:  One-Hot
 ; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output             ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------+
 ; 3:1                ; 7 bits    ; 14 LEs        ; 7 LEs                ; 7 LEs                  ; Yes        ; |toplevel|cache:xcache|init_index[5]   ;
-; 3:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; Yes        ; |toplevel|cache:xcache|word_number[0]  ;
-; 3:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; No         ; |toplevel|cache:xcache|s_memread       ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; Yes        ; |toplevel|cache:xcache|word_number[1]  ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; No         ; |toplevel|cache:xcache|current         ;
+; 4:1                ; 10 bits   ; 20 LEs        ; 20 LEs               ; 0 LEs                  ; No         ; |toplevel|cache:xcache|Selector8       ;
 ; 6:1                ; 20 bits   ; 80 LEs        ; 40 LEs               ; 40 LEs                 ; No         ; |toplevel|cache:xcache|Selector125     ;
 ; 7:1                ; 2 bits    ; 8 LEs         ; 6 LEs                ; 2 LEs                  ; No         ; |toplevel|cache:xcache|Selector56      ;
-; 7:1                ; 12 bits   ; 48 LEs        ; 24 LEs               ; 24 LEs                 ; No         ; |toplevel|memory:xmemory|writedata[21] ;
-; 7:1                ; 7 bits    ; 28 LEs        ; 7 LEs                ; 21 LEs                 ; No         ; |toplevel|cache:xcache|Selector104     ;
-; 7:1                ; 10 bits   ; 40 LEs        ; 20 LEs               ; 20 LEs                 ; No         ; |toplevel|cache:xcache|Selector96      ;
-; 7:1                ; 2 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; No         ; |toplevel|cache:xcache|Selector111     ;
+; 7:1                ; 12 bits   ; 48 LEs        ; 24 LEs               ; 24 LEs                 ; No         ; |toplevel|memory:xmemory|writedata[31] ;
+; 7:1                ; 7 bits    ; 28 LEs        ; 7 LEs                ; 21 LEs                 ; No         ; |toplevel|cache:xcache|Selector110     ;
+; 7:1                ; 10 bits   ; 40 LEs        ; 20 LEs               ; 20 LEs                 ; No         ; |toplevel|cache:xcache|Selector101     ;
+; 7:1                ; 2 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; No         ; |toplevel|cache:xcache|Selector112     ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------+
 
 
@@ -443,41 +410,12 @@ Note: In order to hide this table in the UI and the text report file, please set
 +------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-+-----------------------------------------------------+
-; Post-Synthesis Netlist Statistics for Top Partition ;
-+-----------------------+-----------------------------+
-; Type                  ; Count                       ;
-+-----------------------+-----------------------------+
-; boundary_port         ; 88                          ;
-; cycloneiii_ff         ; 18013                       ;
-;     CLR               ; 12                          ;
-;     CLR SCLR          ; 1                           ;
-;     ENA               ; 17920                       ;
-;     ENA CLR           ; 2                           ;
-;     ENA CLR SCLR      ; 7                           ;
-;     SCLR              ; 20                          ;
-;     plain             ; 51                          ;
-; cycloneiii_lcell_comb ; 14787                       ;
-;     arith             ; 56                          ;
-;         2 data inputs ; 56                          ;
-;     normal            ; 14731                       ;
-;         1 data inputs ; 3                           ;
-;         2 data inputs ; 48                          ;
-;         3 data inputs ; 635                         ;
-;         4 data inputs ; 14045                       ;
-; cycloneiii_ram_block  ; 2048                        ;
-;                       ;                             ;
-; Max LUT depth         ; 14.00                       ;
-; Average LUT depth     ; 8.88                        ;
-+-----------------------+-----------------------------+
-
-
 +-------------------------------+
 ; Elapsed Time Per Partition    ;
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:50     ;
+; Top            ; 00:01:17     ;
 +----------------+--------------+
 
 
@@ -486,10 +424,10 @@ Note: In order to hide this table in the UI and the text report file, please set
 +-------------------------------+
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
-    Info: Version 14.1.0 Build 186 12/03/2014 SJ Web Edition
-    Info: Processing started: Sun Mar 01 04:03:55 2015
+    Info: Version 13.1.0 Build 162 10/23/2013 SJ Web Edition
+    Info: Processing started: Wed Mar 18 12:20:35 2015
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off Project -c Project
-Info (11104): Parallel Compilation has detected 8 hyper-threaded processors. However, the extra hyper-threaded processors will not be used by default. Parallel Compilation will use 4 of the 4 physical processors detected instead.
+Warning (20028): Parallel compilation is not licensed and has been disabled
 Info (12021): Found 2 design units, including 1 entities, in source file vhdl/testbench/memory_tb.vhd
     Info (12022): Found design unit 1: memory_tb-behaviour
     Info (12023): Found entity 1: memory_tb
@@ -525,6 +463,8 @@ Info (12128): Elaborating entity "memory" for hierarchy "memory:xmemory"
 Warning (10036): Verilog HDL or VHDL warning at memory.vhd(54): object "delay_done" assigned a value but never read
 Info (12128): Elaborating entity "ram" for hierarchy "memory:xmemory|ram:xram"
 Info (12128): Elaborating entity "cache" for hierarchy "cache:xcache"
+Warning (10541): VHDL Signal Declaration warning at cache.vhd(31): used implicit default value for signal "m_opposite_readdata" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
+Warning (10541): VHDL Signal Declaration warning at cache.vhd(32): used implicit default value for signal "m_opposite_waitrequest" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations.
 Info (12128): Elaborating entity "cache_set" for hierarchy "cache:xcache|cache_set:xcache"
 Info (19000): Inferred 1 megafunctions from design logic
     Info (276029): Inferred altsyncram megafunction from the following design logic: "memory:xmemory|ram:xram|memory_rtl_0" 
@@ -559,18 +499,106 @@ Info (12021): Found 1 design units, including 1 entities, in source file db/mux_
 Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
 Info (13000): Registers with preset signals will power-up high
 Info (13003): DEV_CLRn pin will set, and not reset, register with preset signal due to NOT Gate Push-Back
+Warning (13024): Output pins are stuck at VCC or GND
+    Warning (13410): Pin "m_opposite_readdata[0]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[1]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[2]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[3]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[4]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[5]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[6]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[7]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[8]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[9]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[10]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[11]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[12]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[13]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[14]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[15]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[16]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[17]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[18]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[19]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[20]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[21]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[22]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[23]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[24]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[25]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[26]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[27]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[28]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[29]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[30]" is stuck at GND
+    Warning (13410): Pin "m_opposite_readdata[31]" is stuck at GND
+    Warning (13410): Pin "m_opposite_waitrequest" is stuck at GND
 Info (286030): Timing-Driven Synthesis is running
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
-Info (21057): Implemented 34863 device resources after synthesis - the final resource count might be different
-    Info (21058): Implemented 55 input pins
-    Info (21059): Implemented 33 output pins
-    Info (21061): Implemented 32727 logic cells
+Warning (21074): Design contains 53 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[0]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[1]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[2]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[3]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[4]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[5]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[6]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[7]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[8]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[9]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[10]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[11]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[12]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[13]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[14]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[15]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[16]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[17]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[18]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[19]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[20]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[21]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[22]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[23]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[24]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[25]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[26]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[27]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[28]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[29]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[30]"
+    Warning (15610): No output dependent on input pin "m_opposite_writedata[31]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[0]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[1]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[2]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[3]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[4]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[5]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[6]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[7]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[8]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[9]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[10]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[11]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[12]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[13]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[14]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[15]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[16]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[17]"
+    Warning (15610): No output dependent on input pin "m_opposite_address[18]"
+    Warning (15610): No output dependent on input pin "m_opposite_memwrite"
+    Warning (15610): No output dependent on input pin "m_opposite_memread"
+Info (21057): Implemented 34959 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 108 input pins
+    Info (21059): Implemented 66 output pins
+    Info (21061): Implemented 32737 logic cells
     Info (21064): Implemented 2048 RAM segments
-Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 2 warnings
-    Info: Peak virtual memory: 919 megabytes
-    Info: Processing ended: Sun Mar 01 04:05:11 2015
-    Info: Elapsed time: 00:01:16
-    Info: Total CPU time (on all processors): 00:01:29
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 93 warnings
+    Info: Peak virtual memory: 746 megabytes
+    Info: Processing ended: Wed Mar 18 12:22:04 2015
+    Info: Elapsed time: 00:01:29
+    Info: Total CPU time (on all processors): 00:01:16
 
 
