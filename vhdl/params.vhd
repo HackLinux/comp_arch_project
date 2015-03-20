@@ -42,13 +42,13 @@ package body params is
 
 	constant one : unsigned := x"00000001";
 	
-	constant w : integer := 2;  -- 4 bytes per word
-	constant l : integer := 2;  -- 4 words per line
-	constant a : integer := 1;  -- 2-way associative
-	constant s : integer := 7;  -- 128 sets 
-	constant c : integer := 12; -- 4 kB cache
-	constant t : integer := 10; -- 10 tag bits
-	constant r : integer := 19; -- 4 MB SRAM
+	constant w : integer := 2 ;	-- 4 bytes per word		-- DEPENDENCIES : w = c-l-a-s
+	constant l : integer := 2 ;	-- 4 words per line		-- DEPENDENCIES : l = c-w-a-s
+	constant a : integer := 3 ;	-- 2-way associative		-- DEPENDENCIES : a = c-w-l-s
+	constant s : integer := 5 ;	-- 32 sets 					-- DEPENDENCIES : s = c-w-l-a
+	constant c : integer := 12;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
+	constant t : integer := 12;	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
+	constant r : integer := 19;	-- 4 MB SRAM				-- DEPENDENCIES : the size of memory is a design decision
 		
 	constant word_length		: integer := to_integer(unsigned(shift_left(one,w+3)));
 	constant words_per_line	: integer := to_integer(unsigned(shift_left(one,l)));

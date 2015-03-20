@@ -19,29 +19,33 @@ use work.params.all;
 
 entity cache_set is
 	port	(	clk				: in  std_logic;
-				write_en			: in	std_logic;
-				address			: in  std_logic_vector(s+l-1 downto 0);
-				ctrl_in			: in	std_logic_vector(t+1 downto 0);
+				word_write		: in	std_logic;
+				ctrl_write		: in  std_logic;
+				r_addr			: in  std_logic_vector(s+l-1 downto 0);
+				w_addr			: in  std_logic_vector(s+l-1 downto 0);				
+				ctrl_in			: in	std_logic_vector(t+a+1 downto 0);
 				word_in			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out			: out std_logic_vector(t+1 downto 0);
+				ctrl_out			: out std_logic_vector(t+a+1 downto 0);
 				word_out			: out std_logic_vector(word_length-1 downto 0)
 			);
 end cache_set;
 
-architecture a of cache_set is
+architecture a0 of cache_set is
 
-	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(t+1 downto 0);
+	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(t+a+1 downto 0);
 		
 	type line_data is array (words_per_line-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 	type cache_data is array (lines_per_set-1 downto 0) of line_data;
 
 
-	signal index 		: integer range 0 to lines_per_set-1;
-	signal offset		: integer range 0 to words_per_line-1;
+	signal r_index 		: integer range 0 to lines_per_set-1;
+	signal r_offset		: integer range 0 to words_per_line-1;
+	signal w_index 		: integer range 0 to lines_per_set-1;
+	signal w_offset		: integer range 0 to words_per_line-1;
 	
 	-- RAW new--
-	signal index_reg 	: integer range 0 to lines_per_set-1;
-	signal offset_reg	: integer range 0 to words_per_line-1;
+	signal r_index_reg 	: integer range 0 to lines_per_set-1;
+	signal r_offset_reg	: integer range 0 to words_per_line-1;
 
 	signal ctrldata : cache_ctrl;
 	signal linedata : cache_data;
@@ -49,31 +53,37 @@ architecture a of cache_set is
 begin
 	
 	-- extract the different fields from the input address
-	index <= to_integer(unsigned(address(s+l-1 downto l)));
-	offset <= to_integer(unsigned(address(l-1 downto 0)));
+	w_index <= to_integer(unsigned(w_addr(s+l-1 downto l)));
+	w_offset <= to_integer(unsigned(w_addr(l-1 downto 0)));
+	r_index <= to_integer(unsigned(r_addr(s+l-1 downto l)));
+	r_offset <= to_integer(unsigned(r_addr(l-1 downto 0)));
 	
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
 			
-			if(write_en = '1') then
-				ctrldata(index) <= ctrl_in;
-				linedata(index)(offset) <= word_in;
+			if(word_write = '1') then
+				linedata(w_index)(w_offset) <= word_in;
 			end if;
 			
+			if(ctrl_write = '1') then
+				ctrldata(w_index) <= ctrl_in;
+			end if;				
+
+			
 			--RAW old--
-			--ctrl_out <= ctrldata(index);
-			--word_out <= linedata(index)(offset);
+			--ctrl_out <= ctrldata(r_index);
+			--word_out <= linedata(r_index)(r_offset);
 			
 			--RAW new--
-			index_reg <= index;
-         offset_reg <= offset;
+			r_index_reg <= r_index;
+         r_offset_reg <= r_offset;
 
 		end if;
 	end process;
 	
 	--RAW new--
-	ctrl_out <= ctrldata(index_reg);
-	word_out <= linedata(index_reg)(offset_reg);
+	ctrl_out <= ctrldata(r_index_reg);
+	word_out <= linedata(r_index_reg)(r_offset_reg);
 		
-end a;
+end a0;

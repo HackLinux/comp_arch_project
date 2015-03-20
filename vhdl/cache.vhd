@@ -15,21 +15,13 @@ entity cache is
 	port	(	clk				: in  std_logic;
 				rst				: in 	std_logic;
 				
-				-- I/O interface for the matched processor
-				m_matched_writedata		: in  std_logic_vector (word_length-1 downto 0);
-				m_matched_address		: in  std_logic_vector(r-1 downto 0);
-				m_matched_memwrite		: in  std_logic;
-				m_matched_memread		: in  std_logic;
-				m_matched_readdata		: out std_logic_vector (word_length-1 downto 0);
-				m_matched_waitrequest	: out std_logic;
-				
-				-- I/O interface for the opposite processor
-				m_opposite_writedata		: in  std_logic_vector (word_length-1 downto 0);
-				m_opposite_address		: in  std_logic_vector(r-1 downto 0);
-				m_opposite_memwrite		: in  std_logic;
-				m_opposite_memread		: in  std_logic;
-				m_opposite_readdata		: out std_logic_vector (word_length-1 downto 0);
-				m_opposite_waitrequest	: out std_logic;
+				-- I/O interface for the FSM/Processor
+				m_writedata		: in  std_logic_vector (word_length-1 downto 0);
+				m_address		: in  std_logic_vector(r-1 downto 0);
+				m_memwrite		: in  std_logic;
+				m_memread		: in  std_logic;
+				m_readdata		: out std_logic_vector (word_length-1 downto 0);
+				m_waitrequest	: out std_logic;
 				
 				-- I/O interface for memory
 				s_writedata		: out std_logic_vector (word_length-1 downto 0);
@@ -73,9 +65,9 @@ architecture direct_mapped of cache is
 	signal cache_write	: std_logic;
 	signal cache_addr		: std_logic_vector(s+l-1 downto 0);
 
-	signal m_matched_tag			: std_logic_vector(t-1 downto 0);
-	signal m_matched_index			: std_logic_vector(s-1 downto 0);
-	signal m_matched_offset		: std_logic_vector(l-1 downto 0);
+	signal m_tag			: std_logic_vector(t-1 downto 0);
+	signal m_index			: std_logic_vector(s-1 downto 0);
+	signal m_offset		: std_logic_vector(l-1 downto 0);
 	signal cache_index	: std_logic_vector(s-1 downto 0);
 	signal cache_offset	: std_logic_vector(l-1 downto 0);
 	signal init_index		: unsigned(s-1 downto 0);
@@ -88,10 +80,13 @@ architecture direct_mapped of cache is
 	signal hit					: std_logic;
 	signal empty_slot			: std_logic;
 	signal dma_req				: std_logic;
+	signal dma_req_reg		: std_logic;
 	signal ds_waitrequest	: std_logic;
 	signal word_rst			: std_logic;
 	signal word_number		: unsigned(l-1 downto 0);
 	signal dword_number		: unsigned(l-1 downto 0);
+	
+	signal simu_friend		: std_logic;
 	
 begin
 
@@ -99,9 +94,9 @@ begin
 	
 	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
 	
-	m_matched_tag <= m_matched_address(t+s+l-1 downto s+l);
-	m_matched_index <= m_matched_address(s+l-1 downto l);
-	m_matched_offset <= m_matched_address(l-1 downto 0);
+	m_tag <= m_address(t+s+l-1 downto s+l);
+	m_index <= m_address(s+l-1 downto l);
+	m_offset <= m_address(l-1 downto 0);
 	
 	cache_addr(s+l-1 downto l) <= cache_index;
 	cache_addr(l-1 downto 0) <= cache_offset;
@@ -115,9 +110,9 @@ begin
 	tag_out <= ctrl_out(t-1 downto 0);
 	
 	
-	hit <= '1' when ((unsigned(m_matched_tag) = unsigned(tag_out)) and valid_out = '1') else '0';
+	hit <= '1' when ((unsigned(m_tag) = unsigned(tag_out)) and valid_out = '1') else '0';
 	empty_slot <= not dirty_out;
-	dma_req <= m_matched_address(r-1);
+	dma_req <= m_address(r-1);
 	
 	-- register for the s_waitrequest signal
 	ds_wait:
@@ -176,6 +171,25 @@ begin
 		
 		end process word_counter;
 	
+	dma_request_reg:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				dma_req_reg <= '0';
+			elsif(rising_edge(clk)) then
+				dma_req_reg <= dma_req;
+			end if;
+		end process dma_request_reg;
+		
+	simulation_friend:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				simu_friend <= '0';
+			elsif(falling_edge(clk)) then
+				simu_friend <= not simu_friend;
+			end if;
+		end process simulation_friend;
 
 	state_assignment:
 		process(clk, rst)
@@ -198,7 +212,7 @@ begin
 					when idle =>
 						if(dma_req = '1') then
 							current <= dma;
-						elsif((m_matched_memread xor m_matched_memwrite) = '1') then -- there can be only one
+						elsif((m_memread xor m_memwrite) = '1') then -- there can be only one
 							current <= busy;
 						else
 							current <= idle;
@@ -211,7 +225,7 @@ begin
 							current <= idle;
 						
 						-- write miss
-						elsif(m_matched_memwrite = '1') then
+						elsif(m_memwrite = '1') then
 							current <= mem_write;
 						
 						-- read miss with no write back required
@@ -256,7 +270,7 @@ begin
 		end process state_assignment;
 		
 	output_assignments:
-		process(current, init_index, init_offset, m_matched_index, m_matched_offset, word_out, m_matched_tag, m_matched_writedata, hit, word_number, m_matched_memwrite, m_matched_address, empty_slot, s_readdata, dword_number, s_waitrequest, ds_waitrequest, tag_out, m_matched_memread)
+		process(simu_friend)--current, init_index, init_offset, m_index, m_offset, word_out, m_tag, m_writedata, hit, word_number, m_memwrite, m_address, empty_slot, s_readdata, dword_number, s_waitrequest, ds_waitrequest, tag_out, m_memread)
 		begin
 			case current is
 				
@@ -275,8 +289,8 @@ begin
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= '1';
-					m_matched_readdata <= (others => '0');
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
@@ -308,8 +322,8 @@ begin
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= '1';
-					m_matched_readdata <= (others => '0');
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
@@ -334,15 +348,19 @@ begin
 					valid_in <= '0';
 					tag_in <= (others => '0');
 					word_in <= (others => '0');
-					cache_index <= m_matched_index;
-					cache_offset <= m_matched_offset;
+					cache_index <= m_index;
+					cache_offset <= m_offset;
 					cache_write <= '0';
 					
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= '1';
-					m_matched_readdata <= word_out;
+					m_waitrequest <= '1';
+					if(dma_req_reg = '1') then
+						m_readdata <= s_readdata;
+					else
+						m_readdata <= word_out;
+					end if;
 					
 					---------------------
 					----slave outputs----
@@ -365,17 +383,17 @@ begin
 					-----------------------------
 					dirty_in <= '1';
 					valid_in <= '1';
-					tag_in <= m_matched_tag;
-					word_in <= m_matched_writedata;
+					tag_in <= m_tag;
+					word_in <= m_writedata;
 					
-					cache_index <= m_matched_index;
+					cache_index <= m_index;
 					if(hit = '1') then
-						cache_offset <= m_matched_offset;
+						cache_offset <= m_offset;
 					else
 						cache_offset <= std_logic_vector(word_number);
 					end if;
 					
-					if((m_matched_memwrite = '1') and (hit = '1')) then -- write hit
+					if((m_memwrite = '1') and (hit = '1')) then -- write hit
 						cache_write <= '1';
 					else
 						cache_write <= '0';
@@ -385,12 +403,12 @@ begin
 					----master outputs----
 					----------------------
 					if(hit = '1') then
-						m_matched_waitrequest <= '0';
+						m_waitrequest <= '0';
 					else
-						m_matched_waitrequest <= '1';
+						m_waitrequest <= '1';
 					end if;
 					
-					m_matched_readdata <= (others => '0');
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
@@ -403,17 +421,17 @@ begin
 						s_writedata <= (others => '0');
 						
 					-- write miss	
-					elsif(m_matched_memwrite = '1') then
+					elsif(m_memwrite = '1') then
 						s_memread <= '0';
 						s_memwrite <= '1';
-						s_address <= m_matched_address;
-						s_writedata <= m_matched_writedata;
+						s_address <= m_address;
+						s_writedata <= m_writedata;
 						
 					-- read miss with no write back required	
 					elsif(empty_slot = '1') then
 						s_memread <= '1';
 						s_memwrite <= '0';
-						s_address(r-1 downto l) <= m_matched_address(r-1 downto l);
+						s_address(r-1 downto l) <= m_address(r-1 downto l);
 						s_address(l-1 downto 0) <= std_logic_vector(word_number);
 						s_writedata <= (others => '0');
 					
@@ -438,17 +456,17 @@ begin
 					-----------------------------
 					dirty_in <= '0';
 					valid_in <= '1';
-					tag_in <= m_matched_tag;
+					tag_in <= m_tag;
 					word_in <= s_readdata;
-					cache_index <= m_matched_index;
+					cache_index <= m_index;
 					cache_offset <= std_logic_vector(dword_number);
 					cache_write <= not ds_waitrequest;
 					
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= '1';
-					m_matched_readdata <= (others => '0');
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
@@ -461,7 +479,7 @@ begin
 					
 					s_memwrite <= '0';
 					
-					s_address(r-1 downto l) <= m_matched_address(r-1 downto l);
+					s_address(r-1 downto l) <= m_address(r-1 downto l);
 					s_address(l-1 downto 0) <= std_logic_vector(word_number);
 					s_writedata <= (others => '0');
 					
@@ -487,16 +505,16 @@ begin
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= s_waitrequest;
-					m_matched_readdata <= (others => '0');
+					m_waitrequest <= s_waitrequest;
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
 					---------------------
 					s_memread <= '0';
 					s_memwrite <= '1';
-					s_address <= m_matched_address;
-					s_writedata <= m_matched_writedata;
+					s_address <= m_address;
+					s_writedata <= m_writedata;
 					
 					----------------------
 					----internal logic----
@@ -513,15 +531,15 @@ begin
 					valid_in <= '0';
 					tag_in <= tag_out;
 					word_in <= (others => '0');
-					cache_index <= m_matched_index;
+					cache_index <= m_index;
 					cache_offset <= std_logic_vector(word_number);
 					cache_write <= not s_waitrequest;				
 					
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= '1';
-					m_matched_readdata <= (others => '0');
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
 					
 					---------------------
 					----slave outputs----
@@ -529,7 +547,7 @@ begin
 					s_memread <= '0';
 					s_memwrite <= ds_waitrequest;
 					s_address(r-1 downto s+l) <= tag_out;
-					s_address(s+l-1 downto l) <= m_matched_index;
+					s_address(s+l-1 downto l) <= m_index;
 					s_address(l-1 downto 0) <= std_logic_vector(word_number);
 					s_writedata <= word_out;
 					
@@ -555,16 +573,16 @@ begin
 					----------------------
 					----master outputs----
 					----------------------
-					m_matched_waitrequest <= s_waitrequest;
-					m_matched_readdata <= s_readdata;
+					m_waitrequest <= s_waitrequest;
+					m_readdata <= s_readdata;
 					
 					---------------------
 					----slave outputs----
 					---------------------
-					s_memread <= m_matched_memread;
-					s_memwrite <= m_matched_memwrite;
-					s_address <= m_matched_address;
-					s_writedata <= m_matched_writedata;
+					s_memread <= m_memread;
+					s_memwrite <= m_memwrite;
+					s_address <= m_address;
+					s_writedata <= m_writedata;
 					
 					----------------------
 					----internal logic----

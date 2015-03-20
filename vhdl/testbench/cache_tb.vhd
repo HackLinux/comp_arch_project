@@ -22,7 +22,7 @@ architecture behaviour of cache_tb is
 				);
 	end component;
 	
-	component cache is
+	component cache_final is
 		port	(	clk				: in  std_logic;
 					rst				: in  std_logic;
 		
@@ -40,7 +40,7 @@ architecture behaviour of cache_tb is
 					s_readdata		: in  std_logic_vector (word_length-1 downto 0);
 					s_waitrequest	: in  std_logic
 				);
-	end component cache;
+	end component cache_final;
 
     --all the input signals with initial values
 	signal clk				: std_logic := '0';
@@ -62,7 +62,7 @@ begin
 	 
     --dut => Device Under Test
 	 xmemory: memory port map(clk,rst,s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
-    xcache: cache port map(clk,rst,m_writedata,m_address,m_memwrite,m_memread,m_readdata,m_waitrequest,s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
+    xcache: cache_final port map(clk,rst,m_writedata,m_address,m_memwrite,m_memread,m_readdata,m_waitrequest,s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
     
 	 clk_process : process
     begin
@@ -91,7 +91,8 @@ begin
 		m_memwrite <= '0';
 		m_memread <= '1';
 		
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -107,7 +108,8 @@ begin
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 
 		wait until rising_edge(clk);
@@ -124,12 +126,14 @@ begin
 		m_memwrite <= '1';
 		m_memread <= '0';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_writedata <= (others => '0');
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -145,17 +149,19 @@ begin
 		m_memwrite <= '1';
 		m_memread <= '0';
 
-		--DEBOUNCE--
-		wait until falling_edge(m_waitrequest);
-		wait for clock_period/10;
+--		--DEBOUNCE--
+--		wait until falling_edge(m_waitrequest);
+--		wait for clock_period/10;
+--		
 		
-		
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_writedata <= (others => '0');
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -171,7 +177,8 @@ begin
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -187,12 +194,14 @@ begin
 		m_memwrite <= '1';
 		m_memread <= '0';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_writedata <= (others => '0');
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -205,12 +214,14 @@ begin
 		m_memwrite <= '1';
 		m_memread <= '0';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_writedata <= (others => '0');
 		m_memwrite <= '0';
 		m_memread <= '1';
 
-		wait until rising_edge(m_waitrequest);
+		--wait until rising_edge(m_waitrequest);
+		wait until (rising_edge(clk) and (m_waitrequest = '0'));
 		m_memread <= '0';
 		
 		wait until rising_edge(clk);
@@ -221,19 +232,21 @@ begin
 		----------------------------------
 		--Loop through the entire memory--
 		----------------------------------
+		m_memwrite <= '0';
 		for i in 0 to ram_size-1 loop
 			m_address <= std_logic_vector(to_unsigned(i, r));
-			m_memwrite <= '0';
 			m_memread <= '1';
 			
-			
-			--DEBOUNCE--
-			wait until falling_edge(m_waitrequest);
-			wait for clock_period/10;
-			
-			
-			wait until rising_edge(m_waitrequest);
+--			
+--			--DEBOUNCE--
+--			wait until falling_edge(m_waitrequest);
+--			wait for clock_period/10;
+--			
+--			
+			--wait until rising_edge(m_waitrequest);
+			wait until (rising_edge(clk) and (m_waitrequest = '0'));
 			m_memread <= '0';
+			m_address <= std_logic_vector(to_unsigned(0, r));
 
 			wait until rising_edge(clk);
 			assert m_readdata = std_logic_vector(to_unsigned(i, word_length)) report "Loop Failure" severity error;

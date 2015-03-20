@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <LOG_ROOT>
 	<PROJECT NAME="Project">
-		<CBX_INST_ENTRY INSTANCE_NAME="|toplevel|memory:xmemory|ram:xram|altsyncram:memory_rtl_0" CBX_FILE_NAME="altsyncram_op41.tdf"/>
 	</PROJECT>
 </LOG_ROOT>

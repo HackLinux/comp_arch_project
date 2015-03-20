@@ -1,0 +1,686 @@
+--************************************************
+-- file		: cache.vhd
+-- author	: harsh aurora
+-- date		: 25 jan 2015
+--
+-- brief	   : the cache  
+--************************************************
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.params.all;
+
+entity cache_2 is
+	port	(	clk				: in  std_logic;
+				rst				: in 	std_logic;
+				
+				-- I/O interface for the FSM/Processor
+				m_writedata		: in  std_logic_vector (word_length-1 downto 0);
+				m_address		: in  std_logic_vector(r-1 downto 0);
+				m_memwrite		: in  std_logic;
+				m_memread		: in  std_logic;
+				m_readdata		: out std_logic_vector (word_length-1 downto 0);
+				m_waitrequest	: out std_logic;
+				
+				-- I/O interface for memory
+				s_writedata		: out std_logic_vector (word_length-1 downto 0);
+				s_address		: out std_logic_vector(r-1 downto 0);
+				s_memwrite		: out std_logic;
+				s_memread		: out std_logic;
+				s_readdata		: in  std_logic_vector (word_length-1 downto 0);
+				s_waitrequest	: in  std_logic
+			);
+end cache_2;
+
+architecture direct_mapped of cache_2 is
+	
+	component cache_set is
+	port	(	clk				: in  std_logic;
+				write_en			: in	std_logic;
+				address			: in  std_logic_vector(s+l-1 downto 0);
+				ctrl_in			: in	std_logic_vector(t+a+1 downto 0);
+				word_in			: in	std_logic_vector(word_length-1 downto 0);
+				ctrl_out			: out std_logic_vector(t+a+1 downto 0);
+				word_out			: out std_logic_vector(word_length-1 downto 0)
+			);
+	end component cache_set;
+	
+	-- the states for the state machine that implements the cache funtionality
+	type state is (reset, init, idle, busy, mem_read, mem_write, write_back, dma);
+	
+	type cache_addr_t		is array (number_of_sets-1 downto 0) of std_logic_vector(s+l-1 downto 0);
+	type cache_ctrl_t		is array (number_of_sets-1 downto 0) of std_logic_vector(t+a+1 downto 0);
+	type cache_word_t		is array (number_of_sets-1 downto 0) of std_logic_vector(word_length-1 downto 0);
+	type cache_tag_t		is array (number_of_sets-1 downto 0) of std_logic_vector(t-1 downto 0);	
+	type cache_index_t	is array (number_of_sets-1 downto 0) of std_logic_vector(s-1 downto 0);	
+	type cache_offset_t	is array (number_of_sets-1 downto 0) of std_logic_vector(l-1 downto 0);
+	type LRU_t				is array (number_of_sets-1 downto 0) of std_logic_vector(a-1 downto 0);
+
+	signal cache_write	: std_logic_vector(number_of_sets-1 downto 0);
+	signal dirty_in		: std_logic_vector(number_of_sets-1 downto 0);
+	signal valid_in		: std_logic_vector(number_of_sets-1 downto 0);
+	signal dirty_out		: std_logic_vector(number_of_sets-1 downto 0);
+	signal valid_out		: std_logic_vector(number_of_sets-1 downto 0);
+	signal hits				: std_logic_vector(number_of_sets-1 downto 0);
+	signal empty_slots	: std_logic_vector(number_of_sets-1 downto 0);
+	signal cache_addr		: cache_addr_t;
+	signal ctrl_in			: cache_ctrl_t;
+	signal ctrl_out		: cache_ctrl_t;
+	signal word_out		: cache_word_t;
+	signal word_in			: cache_word_t;
+	signal tag_in			: cache_tag_t;
+	signal tag_out			: cache_tag_t;
+	signal LRU_in			: LRU_t;
+	signal LRU_out			: LRU_t;
+	signal cache_index	: cache_index_t;
+	signal cache_offset	: cache_offset_t;
+
+	signal m_tag				: std_logic_vector(t-1 downto 0);
+	signal m_index				: std_logic_vector(s-1 downto 0);
+	signal m_offset			: std_logic_vector(l-1 downto 0);
+	
+	signal init_index			: unsigned(s-1 downto 0);
+	signal init_offset		: unsigned(l-1 downto 0);
+	
+	signal current				: state := reset;
+	
+	signal init_en				: std_logic;
+	signal init_done			: std_logic;
+	signal hit 					: std_logic;
+	signal empty_slot			: std_logic;
+	signal dma_req				: std_logic;
+	signal dma_req_reg		: std_logic;
+	signal ds_waitrequest	: std_logic;
+	signal word_rst			: std_logic;
+	signal LRU_update			: std_logic;
+	signal hit_index			: integer range 0 to number_of_sets-1;
+	signal KO_index			: integer range 0 to number_of_sets-1;
+	signal LRU_value			: unsigned(a-1 downto 0);
+	signal word_number		: unsigned(l-1 downto 0);
+	signal dword_number		: unsigned(l-1 downto 0);
+	
+begin
+
+	cache_gen:
+	for i in 0 to number_of_sets-1 generate
+		xcache	: cache_set port map(clk, cache_write(i), cache_addr(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i));
+	end generate cache_gen;
+	
+	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
+	
+	dma_req <= m_address(r-1);
+	
+	m_tag <= m_address(t+s+l-1 downto s+l);
+	m_index <= m_address(s+l-1 downto l);
+	m_offset <= m_address(l-1 downto 0);	
+	
+	for i in 0 to number_of_sets-1 loop
+	
+		cache_addr(i)(s+l-1 downto l) <= cache_index(i);
+		cache_addr(i)(l-1 downto 0) <= cache_offset(i);
+	
+		ctrl_in(i)(t+a+1) <= dirty_in(i);
+		ctrl_in(i)(t+a) <= valid_in(i);
+		ctrl_in(i)(t+a-1 downto t) <= LRU_in(i);
+		ctrl_in(i)(t-1 downto 0) <= tag_in(i);
+	
+		dirty_out(i) <= ctrl_out(i)(t+a+1);
+		valid_out(i) <= ctrl_out(i)(t+a);
+		LRU_out(i) <= ctrl_out(i)(t+a-1 downto t);
+		tag_out(i) <= ctrl_out(i)(t-1 downto 0);
+	
+		hits(i) <= '1' when ((unsigned(m_tag) = unsigned(tag_out(i))) and valid_out(i) = '1') else '0';
+		empty_slots(i) <= not dirty_out(i);
+	
+	end loop;
+
+	hit <=  '0' when unsigned(hits) = 0 else '1';
+	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
+	
+	LRU_value <= LRU_out(hit_index) when LRU_update = '1' else (others => '1');
+	
+	for i in 0 to number_of_sets-1 loop
+		if(valid(i) = '1') then
+			if(LRU_reg(i) = LRU_value) then
+				LRU(i) <= 0;
+			elsif(LRU_reg(i) < LRU_value) then
+				LRU(i) <= LRU_reg(i) + 1;
+			else
+				LRU(i) <= LRU_reg(i);
+			end if;
+		else
+			LRU(i) <= LRU_reg(i);
+		end if;
+	end loop;
+	
+	-- register for the s_waitrequest signal
+	ds_wait:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				ds_waitrequest <= '1';
+			elsif(rising_edge(clk)) then
+				
+				-- delay s_waitrequest to disable s_memread in write_back state
+				ds_waitrequest <= s_waitrequest;
+
+			end if;
+		end process ds_wait;
+	
+	-- counters for the initialization sequence
+	init_counters:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				init_offset <= (others => '0');
+				init_index  <= (others => '0');
+			elsif(rising_edge(clk)) then
+				if(init_en = '1') then
+					init_offset <= init_offset + 1;
+					
+					if(init_offset = words_per_line-1) then
+						init_index <= init_index + 1;
+					else
+						init_index <= init_index;
+					end if;
+				else
+					init_offset <= (others => '0');
+					init_index  <= (others => '0');
+				end if;
+			end if;
+		end process init_counters;
+	
+	-- word counter used in mem_read and write_back
+	word_counter:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				word_number <= (others => '0');
+				dword_number <= (others => '0');
+			elsif(rising_edge(clk)) then
+				if(word_rst = '1') then
+					word_number <= (others => '0');
+				elsif(s_waitrequest = '0') then
+					word_number <= word_number + 1;
+				end if;
+				
+				-- double register the word number
+				dword_number <= word_number;
+			end if;
+		
+		end process word_counter;
+	
+	dma_request_reg:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				dma_req_reg <= '0';
+			elsif(rising_edge(clk)) then
+				dma_req_reg <= dma_req;
+			end if;
+		end process dma_request_reg;
+
+	state_assignment:
+		process(clk, rst)
+		begin
+			if(rst = '1') then
+				current <= reset;
+			elsif(rising_edge(clk)) then
+				case current is
+					
+					when reset =>
+							current <= init;
+					
+					when init =>
+						if(init_done = '1') then
+							current <= idle;
+						else
+							current <= init;
+						end if;
+				
+					when idle =>
+						if(dma_req = '1') then
+							current <= dma;
+						elsif((m_memread xor m_memwrite) = '1') then -- there can be only one
+							current <= busy;
+						else
+							current <= idle;
+						end if;
+					
+					when busy =>
+						
+						-- read/write hits
+						if(hit = '1') then
+							current <= idle;
+						
+						-- write miss
+						elsif(m_memwrite = '1') then
+							current <= mem_write;
+						
+						-- read miss with no write back required
+						elsif(empty_slot = '1') then
+							current <= mem_read;
+							
+						-- read miss with write back required
+						else
+							current <= write_back;
+						end if;
+					
+					when mem_read => 
+						if((ds_waitrequest = '0') and (dword_number = words_per_line-1)) then
+							current <= busy;
+						else
+							current <= mem_read;
+						end if;
+						
+					when mem_write =>
+						if(s_waitrequest = '0') then
+							current <= idle;
+						else
+							current <= mem_write;
+						end if;
+					
+					when write_back =>
+						if((s_waitrequest = '0') and (word_number = words_per_line-1)) then
+							current <= busy;
+						else
+							current <= write_back;
+						end if;
+						
+					when dma =>
+						if(s_waitrequest = '0') then
+							current <= idle;
+						else
+							current <= dma;
+						end if;
+	
+				end case;
+			end if;
+		end process state_assignment;
+		
+	output_assignments:
+		process(current, init_index, init_offset, m_index, m_offset, word_out, m_tag, m_writedata, hits, word_number, m_memwrite, m_address, empty_slot, s_readdata, dword_number, s_waitrequest, ds_waitrequest, tag_out, m_memread, dirty_out)
+		begin
+			case current is
+				
+				when reset =>
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= (others => '0');
+						word_in(i) <= (others => '0');
+						cache_index(i) <= (others => '0');
+						cache_offset(i) <= (others => '0');
+						cache_write(i) <= '0';
+					end loop;
+
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= '0';
+					s_memwrite <= '0';
+					s_address <= (others => '0');
+					s_writedata <= (others => '0');
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+				
+				when init =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= (others => '1');
+						word_in(i) <= (others => '0');
+						cache_index(i) <= std_logic_vector(init_index);
+						cache_offset(i) <= std_logic_vector(init_offset);
+						cache_write(i) <= '1';
+					end loop;
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= '0';
+					s_memwrite <= '0';
+					s_address <= (others => '0');
+					s_writedata <= (others => '0');
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '1';
+					LRU_update <= '0';
+					hit_index <= 0;
+				
+				when idle =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= (others => '0');
+						word_in(i) <= (others => '0');
+						cache_index(i) <= m_index;
+						cache_offset(i) <= m_offset;
+						cache_write(i) <= '0';
+					end loop;
+
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= '1';
+					
+					if(dma_req_reg = '1') then
+						m_readdata <= s_readdata;
+					elsif(hit = '1') then
+						for i in loop 0 to number_of_sets-1
+							if(hits(i) = '1') then
+								m_readdata <= word_out(i);
+							end if;
+						end loop
+					else
+						m_readdata <= (others => '0');
+					end if;
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= '0';
+					s_memwrite <= '0';
+					s_address <= (others => '0');
+					s_writedata <= (others => '0');
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+					
+				when busy =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '1';
+						valid_in(i) <= '1';
+						tag_in(i) <= m_tag;
+						word_in(i) <= m_writedata;
+						cache_index(i) <= m_index;
+						
+						if(hits(i) = '1') then
+							cache_offset(i) <= m_offset;
+						else
+							cache_offset(i) <= std_logic_vector(word_number);
+						end if;
+						
+						cache_write(i) <= m_memwrite and hit(i);
+					end loop;
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= not hit;
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					-- read/write hits
+					if(hit = '1') then 
+						s_memread <= '0';
+						s_memwrite <= '0';
+						s_address <= (others => '0');
+						s_writedata <= (others => '0');
+						
+					-- write miss	
+					elsif(m_memwrite = '1') then
+						s_memread <= '0';
+						s_memwrite <= '1';
+						s_address <= m_address;
+						s_writedata <= m_writedata;
+						
+					-- read miss with no write back required	
+					elsif(empty_slot = '1') then
+						s_memread <= '1';
+						s_memwrite <= '0';
+						s_address(r-1 downto l) <= m_address(r-1 downto l);
+						s_address(l-1 downto 0) <= std_logic_vector(word_number);
+						s_writedata <= (others => '0');
+					
+					-- read miss with write back required
+					else
+						s_memread <= '0';
+						s_memwrite <= '0';
+						s_address <= (others => '0');
+						s_writedata <= (others => '0');
+					end if;
+
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '0';
+					
+					if(hit = '1') then
+						
+						LRU_update <= '1';
+						
+						for i in loop 0 to number_of_sets-1
+							if(hits(i) = 1) then
+								hit_index <= i;
+							end if;
+						end loop;
+						
+					else
+						
+						LRU_update <= '0';
+						hit_index <= 0;
+					
+					end if;
+					
+				when mem_read =>
+
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '1';
+						tag_in(i) <= m_tag;
+						word_in(i) <= s_readdata;
+						cache_index(i) <= m_index;
+						cache_offset(i) <= std_logic_vector(dword_number);
+						--cache_write(i) <= '0';
+					end loop;
+					
+					cache_write_1 <= ((not ds_waitrequest) and (hit_1 or (not dirty_out_1))) and lru_reg;
+
+					cache_write_2 <= ((not ds_waitrequest) and (hit_2 or (not dirty_out_2))) and (not lru_reg);
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					if((dword_number = (words_per_line-1)) and ((s_waitrequest = '0') or (ds_waitrequest = '0'))) then
+						s_memread <= '0';
+					else
+						s_memread <= '1';
+					end if;
+					
+					s_memwrite <= '0';
+					
+					s_address(r-1 downto l) <= m_address(r-1 downto l);
+					s_address(l-1 downto 0) <= std_logic_vector(word_number);
+					s_writedata <= (others => '0');
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '0';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+				
+				when mem_write =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= (others => '0');
+						word_in(i) <= (others => '0');
+						cache_index(i) <= (others => '0');
+						cache_offset(i) <= (others => '0');
+						cache_write(i) <= '0';
+					end loop;
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= s_waitrequest;
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= '0';
+					s_memwrite <= '1';
+					s_address <= m_address;
+					s_writedata <= m_writedata;
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+		
+				when write_back =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= tag_out(i);
+						word_in(i) <= (others => '0');
+						cache_index(i) <= m_index;
+						cache_offset(i) <= std_logic_vector(word_number);
+						--cache_write(i) <= '0';
+					end loop;
+					
+					cache_write_1 <= (not s_waitrequest) and lru_reg;				
+
+					cache_write_2 <= (not s_waitrequest) and (not lru_reg);
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= '1';
+					m_readdata <= (others => '0');
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= '0';
+					s_memwrite <= ds_waitrequest;
+					
+					if(lru_reg = '0') then
+						s_address(r-1 downto s+l) <= tag_out_2;
+						s_writedata <= word_out_2;
+					else
+						s_address(r-1 downto s+l) <= tag_out_1;
+						s_writedata <= word_out_1;
+					end if;
+					
+					s_address(s+l-1 downto l) <= m_index;
+					s_address(l-1 downto 0) <= std_logic_vector(word_number);
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '0';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+				
+				when dma =>
+					
+					-----------------------------
+					----cache control outputs----
+					-----------------------------
+					for i in loop 0 to number_of_sets-1
+						dirty_in(i) <= '0';
+						valid_in(i) <= '0';
+						tag_in(i) <= (others => '0');
+						word_in(i) <= (others => '0');
+						cache_index(i) <= (others => '0');
+						cache_offset(i) <= (others => '0');
+						cache_write(i) <= '0';
+					end loop;
+					
+					----------------------
+					----master outputs----
+					----------------------
+					m_waitrequest <= s_waitrequest;
+					m_readdata <= s_readdata;
+					
+					---------------------
+					----slave outputs----
+					---------------------
+					s_memread <= m_memread;
+					s_memwrite <= m_memwrite;
+					s_address <= m_address;
+					s_writedata <= m_writedata;
+					
+					----------------------
+					----internal logic----
+					----------------------
+					word_rst <= '1';
+					init_en <= '0';
+					LRU_update <= '0';
+					hit_index <= 0;
+				
+			end case;
+		end process output_assignments;
+
+end direct_mapped;
