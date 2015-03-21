@@ -3,7 +3,11 @@
 -- author	: harsh aurora
 -- date		: 25 jan 2015
 --
--- brief	   : the cache  
+-- brief	   : the cache 
+
+-- FIX 		: Write back for non dirty LRU lines
+--				  in the associative case for filled 
+--				  sets
 --************************************************
 
 library ieee;
@@ -122,134 +126,10 @@ architecture direct_mapped of cache_final is
 	
 begin
 
-	cache_gen:
-	for i in 0 to number_of_sets-1 generate
-		xcache	: cache_set port map(clk, cache_word_write(i), cache_ctrl_write(i), cache_r_addr(i), cache_w_addr(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i));
-	end generate cache_gen;
-	
-	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
-	
-	dma_req <= m_address(r-1);
-	
-	m_tag <= m_address(r-1 downto s+l);
-	m_index <= m_address(s+l-1 downto l);
-	m_offset <= m_address(l-1 downto 0);	
-	
-	process(cache_r_index, cache_r_offset, cache_w_index, cache_w_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
-	begin
-		for i in 0 to number_of_sets-1 loop
-		
-			cache_r_addr(i)(s+l-1 downto l) <= cache_r_index(i);
-			cache_r_addr(i)(l-1 downto 0) <= cache_r_offset(i);
-			cache_w_addr(i)(s+l-1 downto l) <= cache_w_index(i);
-			cache_w_addr(i)(l-1 downto 0) <= cache_w_offset(i);
-		
-			ctrl_in(i)(t+a+1) <= dirty_in(i);
-			ctrl_in(i)(t+a) <= valid_in(i);
-			ctrl_in(i)(t+a-1 downto t) <= LRU_in(i);
-			ctrl_in(i)(t-1 downto 0) <= tag_in(i);
-		
-			dirty_out(i) <= ctrl_out(i)(t+a+1);
-			valid_out(i) <= ctrl_out(i)(t+a);
-			LRU_out(i) <= ctrl_out(i)(t+a-1 downto t);
-			tag_out(i) <= ctrl_out(i)(t-1 downto 0);
-			
-			if(unsigned(m_tag) = unsigned(tag_out(i))) then
-				hits(i) <= valid_out(i);
-			else
-				hits(i) <= '0';
-			end if;
-			
-			if(a = 0) then
-				empty_slots(i) <= not dirty_out(i);
-			else
-				empty_slots(i) <= not valid_out(i);
-			end if;
-			
-			if(init_en	= '1') then
-				LRU_in(i) <= (others => '1');
-			elsif((valid_out(i) = '1') and (LRU_update = '1')) then
-				if(i = hit_index) then
-					LRU_in(i) <= (others => '0');
-				elsif(unsigned(LRU_out(i)) < unsigned(LRU_out(hit_index))) then
-					LRU_in(i) <= std_logic_vector(unsigned(LRU_out(i)) + 1);
-				else
-					LRU_in(i) <= LRU_out(i);
-				end if;
-			else
-				LRU_in(i) <= LRU_out(i);
-			end if;
-			
-			if(current = busy) then
-				
-				if(hits(i) = '1') then
-					LRU_update_dirty_in(i) <= '1';
-					LRU_update_valid_in(i) <= '1';
-					LRU_update_tag_in(i) <= m_tag;
-					LRU_update_word_in(i) <= m_writedata;
-				else
-					LRU_update_dirty_in(i) <= dirty_out(i);
-					LRU_update_valid_in(i) <= valid_out(i);
-					LRU_update_tag_in(i) <= tag_out(i);
-					LRU_update_word_in(i) <= word_out(i);
-				end if;
-				
-				if(hit = '1') then
-					if(hits(i) = '1') then
-						hit_index <= i;
-					end if;
-				else
-					hit_index <= hit_index_reg;
-				end if;
-				
-				if(empty_slot = '1') then
-					if(empty_slots(i) = '1') then
-						empty_index <= i;
-					end if;
-					
-					if(unsigned(LRU_in(i)) = number_of_sets-1) then
-						KO_index <= i;
-					end if;
-				else
-					empty_index <= empty_index_reg;
-					KO_index <= KO_index_reg;
-				end if;
-				
-			else
-				hit_index <= hit_index_reg;
-				empty_index <= empty_index_reg;
-				KO_index <= KO_index_reg;
-				
-				LRU_update_dirty_in(i) <= dirty_out(i);
-				LRU_update_valid_in(i) <= valid_out(i);
-				LRU_update_tag_in(i) <= tag_out(i);
-				LRU_update_word_in(i) <= word_out(i);
-			end if;
-			
-			if(i = hit_index) then
-				hit_write(i) <= '1';
-			else
-				hit_write(i) <= '0';
-			end if;
-			
-			if(i = empty_index_reg) then
-				empty_write(i) <= not ds_waitrequest;
-			else
-				empty_write(i) <= '0';
-			end if;
-			
-			if(i = KO_index_reg) then
-				KO_write(i) <= not s_waitrequest;
-			else
-				KO_write(i) <= '0';
-			end if;
-		
-		end loop;
-	end process;
+	----------------------
+	-- SEQUENTIAL LOGIC --
+	----------------------
 
-	hit <=  '0' when unsigned(hits) = 0 else '1';
-	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
-	
 	-- register for the s_waitrequest signal
 	ds_wait:
 		process(clk, rst)
@@ -444,6 +324,139 @@ begin
 				end case;
 			end if;
 		end process state_assignment;
+		
+	-------------------------
+	-- COMBINATIONAL LOGIC --
+	-------------------------
+		
+	cache_gen:
+	for i in 0 to number_of_sets-1 generate
+		xcache	: cache_set port map(clk, cache_word_write(i), cache_ctrl_write(i), cache_r_addr(i), cache_w_addr(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i));
+	end generate cache_gen;
+	
+	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
+	
+	dma_req <= m_address(r-1);
+	
+	m_tag <= m_address(r-1 downto s+l);
+	m_index <= m_address(s+l-1 downto l);
+	m_offset <= m_address(l-1 downto 0);	
+	
+	process(cache_r_index, cache_r_offset, cache_w_index, cache_w_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
+	begin
+		for i in 0 to number_of_sets-1 loop
+		
+			cache_r_addr(i)(s+l-1 downto l) <= cache_r_index(i);
+			cache_r_addr(i)(l-1 downto 0) <= cache_r_offset(i);
+			cache_w_addr(i)(s+l-1 downto l) <= cache_w_index(i);
+			cache_w_addr(i)(l-1 downto 0) <= cache_w_offset(i);
+		
+			ctrl_in(i)(t+a+1) <= dirty_in(i);
+			ctrl_in(i)(t+a) <= valid_in(i);
+			ctrl_in(i)(t+a-1 downto t) <= LRU_in(i);
+			ctrl_in(i)(t-1 downto 0) <= tag_in(i);
+		
+			dirty_out(i) <= ctrl_out(i)(t+a+1);
+			valid_out(i) <= ctrl_out(i)(t+a);
+			LRU_out(i) <= ctrl_out(i)(t+a-1 downto t);
+			tag_out(i) <= ctrl_out(i)(t-1 downto 0);
+			
+			if(unsigned(m_tag) = unsigned(tag_out(i))) then
+				hits(i) <= valid_out(i);
+			else
+				hits(i) <= '0';
+			end if;
+			
+			if(a = 0) then
+				empty_slots(i) <= not dirty_out(i);
+			else
+				empty_slots(i) <= not valid_out(i);
+			end if;
+			
+			if(init_en	= '1') then
+				LRU_in(i) <= (others => '1');
+			elsif((valid_out(i) = '1') and (LRU_update = '1')) then
+				if(i = hit_index) then
+					LRU_in(i) <= (others => '0');
+				elsif(unsigned(LRU_out(i)) < unsigned(LRU_out(hit_index))) then
+					LRU_in(i) <= std_logic_vector(unsigned(LRU_out(i)) + 1);
+				else
+					LRU_in(i) <= LRU_out(i);
+				end if;
+			else
+				LRU_in(i) <= LRU_out(i);
+			end if;
+			
+			if(current = busy) then
+				
+				if(hits(i) = '1') then
+					LRU_update_dirty_in(i) <= '1';
+					LRU_update_valid_in(i) <= '1';
+					LRU_update_tag_in(i) <= m_tag;
+					LRU_update_word_in(i) <= m_writedata;
+				else
+					LRU_update_dirty_in(i) <= dirty_out(i);
+					LRU_update_valid_in(i) <= valid_out(i);
+					LRU_update_tag_in(i) <= tag_out(i);
+					LRU_update_word_in(i) <= word_out(i);
+				end if;
+				
+				if(hit = '1') then
+					if(hits(i) = '1') then
+						hit_index <= i;
+					end if;
+				else
+					hit_index <= hit_index_reg;
+				end if;
+				
+				if(empty_slot = '1') then
+					if(empty_slots(i) = '1') then
+						empty_index <= i;
+					end if;
+					
+					if(unsigned(LRU_in(i)) = number_of_sets-1) then
+						KO_index <= i;
+					end if;
+				else
+					empty_index <= empty_index_reg;
+					KO_index <= KO_index_reg;
+				end if;
+				
+			else
+				hit_index <= hit_index_reg;
+				empty_index <= empty_index_reg;
+				KO_index <= KO_index_reg;
+				
+				LRU_update_dirty_in(i) <= dirty_out(i);
+				LRU_update_valid_in(i) <= valid_out(i);
+				LRU_update_tag_in(i) <= tag_out(i);
+				LRU_update_word_in(i) <= word_out(i);
+			end if;
+			
+			if(i = hit_index) then
+				hit_write(i) <= '1';
+			else
+				hit_write(i) <= '0';
+			end if;
+			
+			if(i = empty_index_reg) then
+				empty_write(i) <= not ds_waitrequest;
+			else
+				empty_write(i) <= '0';
+			end if;
+			
+			if(i = KO_index_reg) then
+				KO_write(i) <= not s_waitrequest;
+			else
+				KO_write(i) <= '0';
+			end if;
+		
+		end loop;
+	end process;
+
+	hit <=  '0' when unsigned(hits) = 0 else '1';
+	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
+	
 		
 	output_assignments:
 		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, ds_waitrequest, KO_write, KO_index_reg, m_memread, hit_reg, hit_write)
