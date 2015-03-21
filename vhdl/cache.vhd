@@ -16,7 +16,7 @@ entity cache is
 				rst				: in 	std_logic;
 				
 				-- I/O interface for the FSM/Processor
-				m_writedata		: in  std_logic_vector (word_length-1 downto 0);
+					: in  std_logic_vector (word_length-1 downto 0);
 				m_address		: in  std_logic_vector(r-1 downto 0);
 				m_memwrite		: in  std_logic;
 				m_memread		: in  std_logic;

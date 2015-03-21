@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<LOG_ROOT>
-	<PROJECT NAME="Project">
-		<CBX_INST_ENTRY INSTANCE_NAME="|cache_set|altsyncram:ctrldata_rtl_0" CBX_FILE_NAME="altsyncram_8nm1.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|cache_set|altsyncram:linedata_rtl_0" CBX_FILE_NAME="altsyncram_iqm1.tdf"/>
-	</PROJECT>
-</LOG_ROOT>
