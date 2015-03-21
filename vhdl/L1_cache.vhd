@@ -11,7 +11,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.params.all;
 
-entity cache_final is
+entity L1_cache is
 	port	(	clk				: in  std_logic;
 				rst				: in 	std_logic;
 				
@@ -39,9 +39,9 @@ entity cache_final is
 				s_readdata		: in  std_logic_vector (word_length-1 downto 0);
 				s_waitrequest	: in  std_logic
 			);
-end cache_final;
+end L1_cache;
 
-architecture direct_mapped of cache_final is
+architecture direct_mapped of L1_cache is
 	
 	component cache_set is
 	port	(	clk				: in  std_logic;
