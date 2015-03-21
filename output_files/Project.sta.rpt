@@ -1,5 +1,5 @@
 TimeQuest Timing Analyzer report for Project
-Sat Mar 21 16:51:23 2015
+Sat Mar 21 17:46:21 2015
 Quartus II 64-Bit Version 13.0.0 Build 156 04/24/2013 SJ Full Version
 
 
@@ -88,7 +88,7 @@ applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit TimeQuest Timing Analyzer
     Info: Version 13.0.0 Build 156 04/24/2013 SJ Full Version
-    Info: Processing started: Sat Mar 21 16:51:19 2015
+    Info: Processing started: Sat Mar 21 17:46:18 2015
 Info: Command: quartus_sta Project -c Project
 Info: qsta_default_script.tcl version: #1
 Info (11104): Parallel Compilation has detected 8 hyper-threaded processors. However, the extra hyper-threaded processors will not be used by default. Parallel Compilation will use 4 of the 4 physical processors detected instead.
@@ -99,7 +99,7 @@ Info (332142): No user constrained base clocks found in the design. Calling "der
 Info (332105): Deriving Clocks
     Info (332105): create_clock -period 1.000 -name clk clk
 Info (332143): No user constrained clock uncertainty found in the design. Calling "derive_clock_uncertainty"
-Info (332123): Deriving Clock Uncertainty. Please refer to report_sdc in TimeQuest to see clock uncertainties.
+Info (332154): The derive_clock_uncertainty command did not apply clock uncertainty to any clock-to-clock transfers.
 Info: Found TIMEQUEST_REPORT_SCRIPT_INCLUDE_DEFAULT_ANALYSIS = ON
 Error (23035): Tcl error: More than 1 positional argument specified: -info, error, File output_files/Project.sta.summary could not be opened
 ---------------------------------------------------------------------------
@@ -134,9 +134,9 @@ Usage: post_message [-h | -help] [-long_help] [-type <info|extra_info|warning|cr
 "main"
     (file "c:/altera/13.0/quartus/common/tcl/internal/qsta_default_script.tcl" line 1134)
 Error: Quartus II 64-Bit TimeQuest Timing Analyzer was unsuccessful. 1 error, 1 warning
-    Error: Peak virtual memory: 557 megabytes
-    Error: Processing ended: Sat Mar 21 16:51:23 2015
-    Error: Elapsed time: 00:00:04
-    Error: Total CPU time (on all processors): 00:00:02
+    Error: Peak virtual memory: 421 megabytes
+    Error: Processing ended: Sat Mar 21 17:46:21 2015
+    Error: Elapsed time: 00:00:03
+    Error: Total CPU time (on all processors): 00:00:01
 
 

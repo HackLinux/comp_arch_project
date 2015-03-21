@@ -1,17 +1,17 @@
-Fitter Status : Successful - Sat Mar 21 16:51:08 2015
+Fitter Status : Successful - Sat Mar 21 17:46:10 2015
 Quartus II 64-Bit Version : 13.0.0 Build 156 04/24/2013 SJ Full Version
 Revision Name : Project
 Top-level Entity Name : cache_set
 Family : Cyclone IV GX
 Device : EP4CGX30CF23C6
 Timing Models : Final
-Total logic elements : 11,202 / 29,440 ( 38 % )
-    Total combinational functions : 11,188 / 29,440 ( 38 % )
-    Dedicated logic registers : 4,654 / 29,440 ( 16 % )
-Total registers : 4654
-Total pins : 229 / 307 ( 75 % )
+Total logic elements : 154 / 29,440 ( < 1 % )
+    Total combinational functions : 116 / 29,440 ( < 1 % )
+    Dedicated logic registers : 150 / 29,440 ( < 1 % )
+Total registers : 150
+Total pins : 215 / 307 ( 70 % )
 Total virtual pins : 0
-Total memory bits : 0 / 1,105,920 ( 0 % )
+Total memory bits : 4,640 / 1,105,920 ( < 1 % )
 Embedded Multiplier 9-bit elements : 0 / 160 ( 0 % )
 Total GXB Receiver Channel PCS : 0 / 4 ( 0 % )
 Total GXB Receiver Channel PMA : 0 / 4 ( 0 % )
