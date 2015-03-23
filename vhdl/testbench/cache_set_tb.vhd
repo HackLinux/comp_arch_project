@@ -55,16 +55,16 @@ architecture a0 of cache_set_tb is
 			pin_ctrl_in_1					: in integer;
 			pin_word_in_1					: in integer;
 			
-			signal pout_addr_0				: out std_logic_vector(s+l-1 downto 0) := (others => '0');
-			signal pout_word_write_0		: out std_logic := '0';
-			signal pout_ctrl_write_0		: out std_logic := '0';
-			signal pout_ctrl_in_0			: out std_logic_vector(t+a+1 downto 0) := (others => '0');
-			signal pout_word_in_0			: out std_logic_vector(word_length-1 downto 0) := (others => '0');
-			signal pout_addr_1				: out std_logic_vector(s+l-1 downto 0) := (others => '0');
-			signal pout_word_write_1		: out std_logic := '0';
-			signal pout_ctrl_write_1		: out std_logic := '0';
-			signal pout_ctrl_in_1			: out std_logic_vector(t+a+1 downto 0) := (others => '0');
-			signal pout_word_in_1			: out std_logic_vector(word_length-1 downto 0) := (others => '0')) 
+			signal pout_addr_0				: out std_logic_vector(s+l-1 downto 0);
+			signal pout_word_write_0		: out std_logic;
+			signal pout_ctrl_write_0		: out std_logic;
+			signal pout_ctrl_in_0			: out std_logic_vector(t+a+1 downto 0);
+			signal pout_word_in_0			: out std_logic_vector(word_length-1 downto 0);
+			signal pout_addr_1				: out std_logic_vector(s+l-1 downto 0);
+			signal pout_word_write_1		: out std_logic;
+			signal pout_ctrl_write_1		: out std_logic;
+			signal pout_ctrl_in_1			: out std_logic_vector(t+a+1 downto 0);
+			signal pout_word_in_1			: out std_logic_vector(word_length-1 downto 0)) 
 	is 
 	begin
 			pout_addr_0 <= std_logic_vector(to_unsigned(pin_addr_0,s+l));

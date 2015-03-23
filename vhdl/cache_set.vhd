@@ -59,8 +59,8 @@ architecture a0 of cache_set is
 	signal index_reg_1 	: integer range 0 to lines_per_set-1;
 	signal offset_reg_1	: integer range 0 to words_per_line-1;
 
-	signal ctrldata : cache_ctrl;
-	signal linedata : cache_data;
+	shared variable ctrldata : cache_ctrl;
+	shared variable linedata : cache_data;
 	
 begin
 	
@@ -77,11 +77,11 @@ begin
 		if(rising_edge(clk)) then
 			
 			if(word_write_0 = '1') then
-				linedata(index_0)(offset_0) <= word_in_0;
+				linedata(index_0)(offset_0) := word_in_0;
 			end if;
 			
 			if(ctrl_write_0 = '1') then
-				ctrldata(index_0) <= ctrl_in_0;
+				ctrldata(index_0) := ctrl_in_0;
 			end if;				
 
 			
@@ -102,11 +102,11 @@ begin
 		if(rising_edge(clk)) then
 			
 			if(word_write_1 = '1') then
-				linedata(index_1)(offset_1) <= word_in_1;
+				linedata(index_1)(offset_1) := word_in_1;
 			end if;
 			
 			if(ctrl_write_1 = '1') then
-				ctrldata(index_1) <= ctrl_in_1;
+				ctrldata(index_1) := ctrl_in_1;
 			end if;				
 
 			
