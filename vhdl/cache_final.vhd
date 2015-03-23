@@ -40,17 +40,25 @@ end cache_final;
 architecture direct_mapped of cache_final is
 	
 	component cache_set is
-	port	(	clk				: in  std_logic;
-				word_write		: in	std_logic;
-				ctrl_write		: in  std_logic;
-				r_addr			: in  std_logic_vector(s+l-1 downto 0);
-				w_addr			: in  std_logic_vector(s+l-1 downto 0);
-				ctrl_in			: in	std_logic_vector(t+a+1 downto 0);
-				word_in			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out			: out std_logic_vector(t+a+1 downto 0);
-				word_out			: out std_logic_vector(word_length-1 downto 0)
+	port	(	clk					: in  std_logic;
+				addr_0				: in  std_logic_vector(s+l-1 downto 0);
+				ctrl_write_0		: in  std_logic;
+				word_write_0		: in	std_logic;
+				ctrl_in_0			: in	std_logic_vector(t+a+1 downto 0);
+				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
+				ctrl_out_0			: out std_logic_vector(t+a+1 downto 0);
+				word_out_0			: out std_logic_vector(word_length-1 downto 0);
+				addr_1				: in  std_logic_vector(s+l-1 downto 0);
+				ctrl_write_1		: in  std_logic;
+				word_write_1		: in	std_logic;
+				ctrl_in_1			: in	std_logic_vector(t+a+1 downto 0);
+				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
+				ctrl_out_1			: out std_logic_vector(t+a+1 downto 0);
+				word_out_1			: out std_logic_vector(word_length-1 downto 0)
 			);
 	end component cache_set;
+	
+	--for all: cache_set use entity work.cache_set(modelsim);
 	
 	-- the states for the state machine that implements the cache funtionality
 	type state is (reset, init, idle, busy, mem_read, mem_write, write_back, dma);
@@ -71,8 +79,7 @@ architecture direct_mapped of cache_final is
 	signal valid_out					: std_logic_vector(number_of_sets-1 downto 0);
 	signal hits							: std_logic_vector(number_of_sets-1 downto 0);
 	signal empty_slots				: std_logic_vector(number_of_sets-1 downto 0);
-	signal cache_r_addr				: cache_addr_t;
-	signal cache_w_addr				: cache_addr_t;
+	signal cache_addr					: cache_addr_t;
 	signal ctrl_in						: cache_ctrl_t;
 	signal ctrl_out					: cache_ctrl_t;
 	signal word_out					: cache_word_t;
@@ -81,10 +88,8 @@ architecture direct_mapped of cache_final is
 	signal tag_out						: cache_tag_t;
 	signal LRU_in						: LRU_t;
 	signal LRU_out						: LRU_t;
-	signal cache_r_index				: cache_index_t;
-	signal cache_r_offset			: cache_offset_t;
-	signal cache_w_index				: cache_index_t;
-	signal cache_w_offset			: cache_offset_t;
+	signal cache_index				: cache_index_t;
+	signal cache_offset				: cache_offset_t;
 
 	signal m_tag						: std_logic_vector(t-1 downto 0);
 	signal m_index						: std_logic_vector(s-1 downto 0);
@@ -123,6 +128,12 @@ architecture direct_mapped of cache_final is
 	signal KO_write					: std_logic_vector(number_of_sets-1 downto 0);
 	
 	signal simu_friend				: std_logic;
+	
+	constant zero_addr 				: std_logic_vector(s+l-1 downto 0) := (others => '0');
+	constant zero_ctrl 				: std_logic_vector(t+a+1 downto 0) := (others => '0');
+	constant zero_word 				: std_logic_vector(word_length-1 downto 0) := (others => '0');
+	signal unused_ctrl				: cache_ctrl_t;
+	signal unused_word				: cache_word_t;
 	
 begin
 
@@ -331,7 +342,7 @@ begin
 		
 	cache_gen:
 	for i in 0 to number_of_sets-1 generate
-		xcache	: cache_set port map(clk, cache_word_write(i), cache_ctrl_write(i), cache_r_addr(i), cache_w_addr(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i));
+		xcache : cache_set port map(clk, cache_addr(i), cache_ctrl_write(i), cache_word_write(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i), zero_addr, '0', '0', zero_ctrl, zero_word, unused_ctrl(i), unused_word(i));
 	end generate cache_gen;
 	
 	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
@@ -342,14 +353,12 @@ begin
 	m_index <= m_address(s+l-1 downto l);
 	m_offset <= m_address(l-1 downto 0);	
 	
-	process(cache_r_index, cache_r_offset, cache_w_index, cache_w_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
+	process(cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
 	begin
 		for i in 0 to number_of_sets-1 loop
 		
-			cache_r_addr(i)(s+l-1 downto l) <= cache_r_index(i);
-			cache_r_addr(i)(l-1 downto 0) <= cache_r_offset(i);
-			cache_w_addr(i)(s+l-1 downto l) <= cache_w_index(i);
-			cache_w_addr(i)(l-1 downto 0) <= cache_w_offset(i);
+			cache_addr(i)(s+l-1 downto l) <= cache_index(i);
+			cache_addr(i)(l-1 downto 0) <= cache_offset(i);
 		
 			ctrl_in(i)(t+a+1) <= dirty_in(i);
 			ctrl_in(i)(t+a) <= valid_in(i);
@@ -471,10 +480,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= (others => (others => '0'));
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => (others => '0'));
-					cache_r_offset <= (others => (others => '0'));					
-					cache_r_index <= (others => (others => '0'));
-					cache_w_offset <= (others => (others => '0'));
+					cache_index <= (others => (others => '0'));
+					cache_offset <= (others => (others => '0'));					
 					cache_word_write <= (others => '0');
 					cache_ctrl_write <= (others => '0');
 
@@ -508,10 +515,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= (others => (others => '1'));
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => (others => '0'));
-					cache_r_offset <= (others => (others => '0'));
-					cache_w_index <= (others => std_logic_vector(init_index));
-					cache_w_offset <= (others => std_logic_vector(init_offset));
+					cache_index <= (others => std_logic_vector(init_index));
+					cache_offset <= (others => std_logic_vector(init_offset));
 					cache_word_write <= (others => '1');
 					cache_ctrl_write <= (others => '1');
 					
@@ -545,10 +550,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= (others => (others => '0'));
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => m_index);
-					cache_r_offset <= (others => m_offset);
-					cache_w_index <= (others => (others => '0'));
-					cache_w_offset <= (others => (others => '0'));
+					cache_index <= (others => m_index);
+					cache_offset <= (others => m_offset);
 					cache_word_write <= (others => '0');
 					cache_ctrl_write <= (others => '0');
 
@@ -597,12 +600,10 @@ begin
 						word_in <= word_out;
 					end if;
 										
-					cache_r_index <= (others => m_index);
-					cache_w_index <= (others => m_index);
+					cache_index <= (others => m_index);
 					
 					if(hit = '1') then
-						cache_r_offset <= (others => m_offset);
-						cache_w_offset <= (others => m_offset);
+						cache_offset <= (others => m_offset);
 						
 						if(m_memwrite = '1') then
 							cache_word_write <= hit_write;
@@ -612,8 +613,7 @@ begin
 						
 						cache_ctrl_write <= (others => '1');
 					else
-						cache_r_offset <= (others => std_logic_vector(word_number));
-						cache_w_offset <= (others => std_logic_vector(word_number));
+						cache_offset <= (others => std_logic_vector(word_number));
 						cache_word_write <= (others => '0');
 						cache_ctrl_write <= (others => '0');
 					end if;
@@ -674,10 +674,8 @@ begin
 					valid_in <= (others => '1');
 					tag_in <= (others => m_tag);
 					word_in <= (others => s_readdata);
-					cache_r_index <= (others => m_index);
-					cache_r_offset <= (others => std_logic_vector(dword_number));
-					cache_w_index <= (others => m_index);
-					cache_w_offset <= (others => std_logic_vector(dword_number));
+					cache_index <= (others => m_index);
+					cache_offset <= (others => std_logic_vector(dword_number));
 					cache_word_write <= empty_write;
 					cache_ctrl_write <= empty_write;
 					
@@ -720,10 +718,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= (others => (others => '0'));
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => (others => '0'));
-					cache_r_offset <= (others => (others => '0'));					
-					cache_r_index <= (others => (others => '0'));
-					cache_w_offset <= (others => (others => '0'));
+					cache_index <= (others => (others => '0'));
+					cache_offset <= (others => (others => '0'));					
 					cache_word_write <= (others => '0');
 					cache_ctrl_write <= (others => '0');	
 					
@@ -757,10 +753,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= tag_out;
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => m_index);
-					cache_r_offset <= (others => std_logic_vector(word_number));				
-					cache_w_index <= (others => m_index);
-					cache_w_offset <= (others => std_logic_vector(word_number));
+					cache_index <= (others => m_index);
+					cache_offset <= (others => std_logic_vector(word_number));				
 					cache_word_write <= KO_write;
 					cache_ctrl_write <= KO_write;
 					
@@ -798,10 +792,8 @@ begin
 					valid_in <= (others => '0');
 					tag_in <= (others => (others => '0'));
 					word_in <= (others => (others => '0'));
-					cache_r_index <= (others => (others => '0'));
-					cache_w_offset <= (others => (others => '0'));					
-					cache_r_index <= (others => (others => '0'));
-					cache_w_offset <= (others => (others => '0'));
+					cache_index <= (others => (others => '0'));
+					cache_offset <= (others => (others => '0'));					
 					cache_word_write <= (others => '0');
 					cache_ctrl_write <= (others => '0');
 					

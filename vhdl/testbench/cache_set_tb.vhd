@@ -11,15 +11,15 @@ architecture a0 of cache_set_tb is
 	component cache_set is
 	port	(	clk					: in  std_logic;
 				addr_0				: in  std_logic_vector(s+l-1 downto 0);
-				word_write_0		: in	std_logic;
 				ctrl_write_0		: in  std_logic;
+				word_write_0		: in	std_logic;
 				ctrl_in_0			: in	std_logic_vector(t+a+1 downto 0);
 				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
 				ctrl_out_0			: out std_logic_vector(t+a+1 downto 0);
 				word_out_0			: out std_logic_vector(word_length-1 downto 0);
 				addr_1				: in  std_logic_vector(s+l-1 downto 0);
-				word_write_1		: in	std_logic;
 				ctrl_write_1		: in  std_logic;
+				word_write_1		: in	std_logic;
 				ctrl_in_1			: in	std_logic_vector(t+a+1 downto 0);
 				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
 				ctrl_out_1			: out std_logic_vector(t+a+1 downto 0);
@@ -47,24 +47,24 @@ architecture a0 of cache_set_tb is
 	
 	procedure set_stim
 		(	pin_addr_0						: in integer;
-			pin_word_write_0				: in integer;
 			pin_ctrl_write_0				: in integer;
+			pin_word_write_0				: in integer;
 			pin_ctrl_in_0					: in integer;
 			pin_word_in_0					: in integer;
 			pin_addr_1						: in integer;
-			pin_word_write_1				: in integer;
 			pin_ctrl_write_1				: in integer;
+			pin_word_write_1				: in integer;
 			pin_ctrl_in_1					: in integer;
 			pin_word_in_1					: in integer;
 			
 			signal pout_addr_0				: out std_logic_vector(s+l-1 downto 0);
-			signal pout_word_write_0		: out std_logic;
 			signal pout_ctrl_write_0		: out std_logic;
+			signal pout_word_write_0		: out std_logic;
 			signal pout_ctrl_in_0			: out std_logic_vector(t+a+1 downto 0);
 			signal pout_word_in_0			: out std_logic_vector(word_length-1 downto 0);
 			signal pout_addr_1				: out std_logic_vector(s+l-1 downto 0);
-			signal pout_word_write_1		: out std_logic;
 			signal pout_ctrl_write_1		: out std_logic;
+			signal pout_word_write_1		: out std_logic;
 			signal pout_ctrl_in_1			: out std_logic_vector(t+a+1 downto 0);
 			signal pout_word_in_1			: out std_logic_vector(word_length-1 downto 0)) 
 	is 
@@ -104,7 +104,7 @@ architecture a0 of cache_set_tb is
 
 	begin
 	
-	xcache_set: cache_set port map(clk, addr_0, word_write_0, ctrl_write_0, ctrl_in_0, word_in_0, ctrl_out_0, word_out_0, addr_1, word_write_1, ctrl_write_1, ctrl_in_1, word_in_1, ctrl_out_1, word_out_1);	
+	xcache_set: cache_set port map(clk, addr_0, ctrl_write_0, word_write_0, ctrl_in_0, word_in_0, ctrl_out_0, word_out_0, addr_1, ctrl_write_1, word_write_1, ctrl_in_1, word_in_1, ctrl_out_1, word_out_1);	
 
 	clk_process:
 		process
@@ -118,9 +118,8 @@ architecture a0 of cache_set_tb is
 	stim:
 		process
 		begin
-			set_stim(0,1,1,21,21,20,0,0,3,3,addr_0, word_write_0, ctrl_write_0, ctrl_in_0, word_in_0, addr_1, word_write_1, ctrl_write_1, ctrl_in_1, word_in_1);
+			set_stim(0,1,1,21,21,20,0,0,3,3,addr_0, ctrl_write_0, word_write_0, ctrl_in_0, word_in_0, addr_1, ctrl_write_1, word_write_1, ctrl_in_1, word_in_1);
 			wait for 2*clock_period;
-			set_stim(0,0,0,21,21,20,0,0,3,3,addr_0, word_write_0, ctrl_write_0, ctrl_in_0, word_in_0, addr_1, word_write_1, ctrl_write_1, ctrl_in_1, word_in_1);
 			wait;
 		end process stim;
 	
