@@ -36,9 +36,30 @@ entity cache_set is
 			);
 end cache_set;
 
-architecture a0 of cache_set is
+architecture a0 of cache_set is 
+	
+	type cache_ctrl is protected
+		procedure store(addr : in integer; data : in std_logic_vector(t+a+1 downto 0));
+		procedure load(addr : in integer; signal data : out std_logic_vector(t+a+1 downto 0));
+	end protected cache_ctrl;
+	
+	type cache_ctrl is protected body
+	
+		type ctrl_data_t is array (lines_per_set-1 downto 0) of std_logic_vector(t+a+1 downto 0);
+		
+		variable ctrl_data_v : ctrl_data_t; 
+		
+		procedure store(addr : in integer; data : in std_logic_vector(t+a+1 downto 0)) is
+		begin
+			ctrl_data_v(addr) := data; 
+		end procedure;
+		
+		procedure load(addr : in integer; signal data : out std_logic_vector(t+a+1 downto 0)) is
+		begin
+			data <= ctrl_data_v(addr);
+		end procedure;
+	end protected body cache_ctrl;
 
-	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(t+a+1 downto 0);
 		
 	type line_data is array (words_per_line-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 	type cache_data is array (lines_per_set-1 downto 0) of line_data;
@@ -71,7 +92,7 @@ begin
 	index_1 <= to_integer(unsigned(addr_1(s+l-1 downto l)));
 	offset_1 <= to_integer(unsigned(addr_1(l-1 downto 0)));
 	
-	-- p0:
+	p0:
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
@@ -81,7 +102,7 @@ begin
 			end if;
 			
 			if(ctrl_write_0 = '1') then
-				ctrldata(index_0) := ctrl_in_0;
+				ctrldata.store(index_0, ctrl_in_0);
 			end if;				
 
 			
@@ -96,7 +117,7 @@ begin
 		end if;
 	end process;
 	
-	-- p1:
+	p1:
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
@@ -106,7 +127,7 @@ begin
 			end if;
 			
 			if(ctrl_write_1 = '1') then
-				ctrldata(index_1) := ctrl_in_1;
+				ctrldata.store(index_1, ctrl_in_1);
 			end if;				
 
 			
@@ -122,10 +143,10 @@ begin
 	end process;
 	
 	--RAW new--
-	ctrl_out_0 <= ctrldata(index_reg_0);
+	ctrldata.load(index_reg_0, ctrl_out_0);
 	word_out_0 <= linedata(index_reg_0)(offset_reg_0);
 	
-	ctrl_out_1 <= ctrldata(index_reg_1);
+	ctrldata.load(index_reg_1, ctrl_out_1);
 	word_out_1 <= linedata(index_reg_1)(offset_reg_1);
 		
 end a0;

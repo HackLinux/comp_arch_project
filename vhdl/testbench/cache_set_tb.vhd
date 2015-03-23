@@ -98,7 +98,7 @@ architecture a0 of cache_set_tb is
 				pout_word_write_1 <= '1';
 			end if;
 			
-end set_stim;
+	end set_stim;
 
 	begin
 	
