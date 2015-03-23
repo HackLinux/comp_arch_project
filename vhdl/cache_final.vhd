@@ -8,6 +8,10 @@
 -- FIX 		: Write back for non dirty LRU lines
 --				  in the associative case for filled 
 --				  sets
+--
+--				  Ctrl write in the mem_read and 
+--				  write_back should only happen once
+--				  pref. right at the start
 --************************************************
 
 library ieee;
