@@ -19,23 +19,16 @@ use work.params.all;
 
 entity cache_set is
 	port	(	clk					: in  std_logic;
-	
 				addr_0				: in  std_logic_vector(s+l-1 downto 0);
-				addr_1				: in  std_logic_vector(s+l-1 downto 0);
-	
 				word_write_0		: in	std_logic;
 				ctrl_write_0		: in  std_logic;
-				--r_addr_0				: in  std_logic_vector(s+l-1 downto 0);
-				--w_addr_0				: in  std_logic_vector(s+l-1 downto 0);				
 				ctrl_in_0			: in	std_logic_vector(t+a+1 downto 0);
 				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
 				ctrl_out_0			: out std_logic_vector(t+a+1 downto 0);
 				word_out_0			: out std_logic_vector(word_length-1 downto 0);
-				
+				addr_1				: in  std_logic_vector(s+l-1 downto 0);
 				word_write_1		: in	std_logic;
 				ctrl_write_1		: in  std_logic;
-				--r_addr_1				: in  std_logic_vector(s+l-1 downto 0);
-				--w_addr_1				: in  std_logic_vector(s+l-1 downto 0);				
 				ctrl_in_1			: in	std_logic_vector(t+a+1 downto 0);
 				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
 				ctrl_out_1			: out std_logic_vector(t+a+1 downto 0);
@@ -93,8 +86,8 @@ begin
 
 			
 			--RAW old--
-			--ctrl_out <= ctrldata(r_index);
-			--word_out <= linedata(r_index)(r_offset);
+			--ctrl_out_0 <= ctrldata(index_0);
+			--word_out_0 <= linedata(index_0)(offset_0);
 			
 			--RAW new--
 			index_reg_0 <= index_0;
@@ -118,8 +111,8 @@ begin
 
 			
 			--RAW old--
-			--ctrl_out <= ctrldata(r_index);
-			--word_out <= linedata(r_index)(r_offset);
+			--ctrl_out_1 <= ctrldata(index_1);
+			--word_out_1 <= linedata(index_1)(offset_1);
 			
 			--RAW new--
 			index_reg_1 <= index_1;
