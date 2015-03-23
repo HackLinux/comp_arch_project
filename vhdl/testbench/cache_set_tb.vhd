@@ -26,7 +26,9 @@ architecture a0 of cache_set_tb is
 				word_out_1			: out std_logic_vector(word_length-1 downto 0)
 			);
 	end component cache_set;
-		
+	
+	for xcache_set : cache_set use entity work.cache_set(modelsim);
+	
 	signal clk					: std_logic := '0';
 	signal addr_0				: std_logic_vector(s+l-1 downto 0) := (others => '0');
 	signal word_write_0		: std_logic := '0';
