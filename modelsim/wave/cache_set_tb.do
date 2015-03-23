@@ -1,20 +1,20 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -label clk /cache_set_tb/clk
-add wave -noupdate -group {Port 0} -label {addr 0} -radix unsigned /cache_set_tb/addr_0
-add wave -noupdate -group {Port 0} -group ctrl -label {ctrl write enable 0} /cache_set_tb/ctrl_write_0
-add wave -noupdate -group {Port 0} -group ctrl -label {ctrl data in 0} -radix unsigned /cache_set_tb/ctrl_in_0
-add wave -noupdate -group {Port 0} -group ctrl -label {ctrl data out 0} -radix unsigned /cache_set_tb/ctrl_out_0
-add wave -noupdate -group {Port 0} -group word -label {word write enable 0} /cache_set_tb/word_write_0
-add wave -noupdate -group {Port 0} -group word -label {word data in 0} -radix unsigned /cache_set_tb/word_in_0
-add wave -noupdate -group {Port 0} -group word -label {word data out 0} -radix unsigned /cache_set_tb/word_out_0
-add wave -noupdate -group {Port 1} -label {addr 1} -radix unsigned /cache_set_tb/addr_1
-add wave -noupdate -group {Port 1} -group ctrl -label {ctrl write enable 1} /cache_set_tb/ctrl_write_1
-add wave -noupdate -group {Port 1} -group ctrl -label {ctrl data in 1} -radix unsigned /cache_set_tb/ctrl_in_1
-add wave -noupdate -group {Port 1} -group ctrl -label {ctrl data out 1} /cache_set_tb/ctrl_out_1
-add wave -noupdate -group {Port 1} -group word -label {word write enable 1} /cache_set_tb/word_write_1
-add wave -noupdate -group {Port 1} -group word -label {word data in 1} -radix unsigned /cache_set_tb/word_in_1
-add wave -noupdate -group {Port 1} -group word -label {word data out 1} -radix unsigned /cache_set_tb/word_out_1
+add wave -noupdate -expand -group {Port 0} -color Firebrick -itemcolor Firebrick -label {addr 0} -radix unsigned /cache_set_tb/addr_0
+add wave -noupdate -expand -group {Port 0} -expand -group ctrl -label {ctrl write enable 0} /cache_set_tb/ctrl_write_0
+add wave -noupdate -expand -group {Port 0} -expand -group ctrl -label {ctrl data in 0} -radix unsigned /cache_set_tb/ctrl_in_0
+add wave -noupdate -expand -group {Port 0} -expand -group ctrl -label {ctrl data out 0} -radix unsigned /cache_set_tb/ctrl_out_0
+add wave -noupdate -expand -group {Port 0} -expand -group word -label {word write enable 0} /cache_set_tb/word_write_0
+add wave -noupdate -expand -group {Port 0} -expand -group word -label {word data in 0} -radix unsigned /cache_set_tb/word_in_0
+add wave -noupdate -expand -group {Port 0} -expand -group word -label {word data out 0} -radix unsigned /cache_set_tb/word_out_0
+add wave -noupdate -expand -group {Port 1} -color Firebrick -itemcolor Firebrick -label {addr 1} -radix unsigned /cache_set_tb/addr_1
+add wave -noupdate -expand -group {Port 1} -expand -group ctrl -label {ctrl write enable 1} /cache_set_tb/ctrl_write_1
+add wave -noupdate -expand -group {Port 1} -expand -group ctrl -label {ctrl data in 1} -radix unsigned /cache_set_tb/ctrl_in_1
+add wave -noupdate -expand -group {Port 1} -expand -group ctrl -label {ctrl data out 1} /cache_set_tb/ctrl_out_1
+add wave -noupdate -expand -group {Port 1} -expand -group word -label {word write enable 1} /cache_set_tb/word_write_1
+add wave -noupdate -expand -group {Port 1} -expand -group word -label {word data in 1} -radix unsigned /cache_set_tb/word_in_1
+add wave -noupdate -expand -group {Port 1} -expand -group word -label {word data out 1} -radix unsigned /cache_set_tb/word_out_1
 add wave -noupdate -group {cache_set internals} -label clk /cache_set_tb/xcache_set/clk
 add wave -noupdate -group {cache_set internals} -radix unsigned /cache_set_tb/xcache_set/addr_0
 add wave -noupdate -group {cache_set internals} /cache_set_tb/xcache_set/word_write_0
