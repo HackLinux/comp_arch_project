@@ -13,30 +13,34 @@ add wave -noupdate -group retard -color Firebrick -itemcolor Firebrick -label {C
 add wave -noupdate -group retard -label {Cache write request} /cache_tb/s_memwrite
 add wave -noupdate -group retard -label {Cache read request} /cache_tb/s_memread
 add wave -noupdate -group retard -color {Medium Blue} -itemcolor {Medium Blue} -label {Cache read data} -radix unsigned /cache_tb/s_readdata
+add wave -noupdate -group retard -color {Medium Blue} -itemcolor {Medium Blue} -label {Cache write data} -radix unsigned /cache_tb/s_writedata
+add wave -noupdate -group retard -color Firebrick -itemcolor Firebrick -label {Cache address} -radix unsigned /cache_tb/s_address
+add wave -noupdate -group retard -label {Cache write request} /cache_tb/s_memwrite
+add wave -noupdate -group retard -label {Cache read request} /cache_tb/s_memread
+add wave -noupdate -group retard -color {Medium Blue} -itemcolor {Medium Blue} -label {Cache read data} -radix unsigned /cache_tb/s_readdata
 add wave -noupdate -divider new
 add wave -noupdate -label clk /cache_tb/xcache/clk
 add wave -noupdate -label {Cache write(Empty)} /cache_tb/xcache/empty_write
 add wave -noupdate -label {Cache write(KO)} /cache_tb/xcache/KO_write
 add wave -noupdate -label {Cache word write} /cache_tb/xcache/cache_word_write
 add wave -noupdate -label {Cache ctrl write} /cache_tb/xcache/cache_ctrl_write
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache write address} -radix unsigned -childformat {{/cache_tb/xcache/cache_w_addr(1) -radix unsigned} {/cache_tb/xcache/cache_w_addr(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/cache_w_addr(1) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_w_addr(0) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned}} /cache_tb/xcache/cache_w_addr
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache write index} -radix unsigned /cache_tb/xcache/cache_w_index
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache write offset} -radix unsigned /cache_tb/xcache/cache_w_offset
-add wave -noupdate -label dirty(w) /cache_tb/xcache/dirty_in
-add wave -noupdate -label valid(w) /cache_tb/xcache/valid_in
-add wave -noupdate -label LRU(w) /cache_tb/xcache/LRU_in
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label tag(w) -radix unsigned /cache_tb/xcache/tag_in
-add wave -noupdate -label ctrl(w) /cache_tb/xcache/ctrl_in
-add wave -noupdate -color {Medium Blue} -itemcolor {Medium Blue} -label word(w) -radix unsigned -childformat {{/cache_tb/xcache/word_in(1) -radix unsigned} {/cache_tb/xcache/word_in(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/word_in(1) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(0) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned}} /cache_tb/xcache/word_in
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache read address} -radix unsigned -childformat {{/cache_tb/xcache/cache_r_addr(1) -radix unsigned} {/cache_tb/xcache/cache_r_addr(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/cache_r_addr(1) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_r_addr(0) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned}} /cache_tb/xcache/cache_r_addr
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache read index} -radix unsigned /cache_tb/xcache/cache_r_index
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache read offset} -radix unsigned /cache_tb/xcache/cache_r_offset
-add wave -noupdate -label dirty(r) /cache_tb/xcache/dirty_out
-add wave -noupdate -label valid(r) /cache_tb/xcache/valid_out
-add wave -noupdate -label LRU(r) /cache_tb/xcache/LRU_out
-add wave -noupdate -color Firebrick -itemcolor Firebrick -label tag(r) -radix unsigned -childformat {{/cache_tb/xcache/tag_out(1) -radix unsigned} {/cache_tb/xcache/tag_out(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/tag_out(1) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(0) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned}} /cache_tb/xcache/tag_out
-add wave -noupdate -label ctrl(r) /cache_tb/xcache/ctrl_out
-add wave -noupdate -color {Medium Blue} -itemcolor {Medium Blue} -label word(r) -radix unsigned -childformat {{/cache_tb/xcache/word_out(1) -radix hexadecimal} {/cache_tb/xcache/word_out(0) -radix hexadecimal}} -subitemconfig {/cache_tb/xcache/word_out(1) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix hexadecimal} /cache_tb/xcache/word_out(0) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix hexadecimal}} /cache_tb/xcache/word_out
+add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache address} -radix unsigned -childformat {{/cache_tb/xcache/cache_addr(7) -radix unsigned} {/cache_tb/xcache/cache_addr(6) -radix unsigned} {/cache_tb/xcache/cache_addr(5) -radix unsigned} {/cache_tb/xcache/cache_addr(4) -radix unsigned} {/cache_tb/xcache/cache_addr(3) -radix unsigned} {/cache_tb/xcache/cache_addr(2) -radix unsigned} {/cache_tb/xcache/cache_addr(1) -radix unsigned} {/cache_tb/xcache/cache_addr(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/cache_addr(7) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(6) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(5) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(4) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(3) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(2) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(1) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/cache_addr(0) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned}} /cache_tb/xcache/cache_addr
+add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache index} -radix unsigned /cache_tb/xcache/cache_index
+add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Cache offset} -radix unsigned /cache_tb/xcache/cache_offset
+add wave -noupdate -expand -group Cache_in -label CCU(w) /cache_tb/xcache/CCU_in
+add wave -noupdate -expand -group Cache_in -label LRU(w) /cache_tb/xcache/LRU_in
+add wave -noupdate -expand -group Cache_in -label dirty(w) /cache_tb/xcache/dirty_in
+add wave -noupdate -expand -group Cache_in -label valid(w) /cache_tb/xcache/valid_in
+add wave -noupdate -expand -group Cache_in -color Firebrick -itemcolor Firebrick -label tag(w) -radix unsigned /cache_tb/xcache/tag_in
+add wave -noupdate -expand -group Cache_in -label ctrl(w) /cache_tb/xcache/ctrl_in
+add wave -noupdate -expand -group Cache_in -color {Medium Blue} -itemcolor {Medium Blue} -label word(w) -radix unsigned -childformat {{/cache_tb/xcache/word_in(7) -radix unsigned} {/cache_tb/xcache/word_in(6) -radix unsigned} {/cache_tb/xcache/word_in(5) -radix unsigned} {/cache_tb/xcache/word_in(4) -radix unsigned} {/cache_tb/xcache/word_in(3) -radix unsigned} {/cache_tb/xcache/word_in(2) -radix unsigned} {/cache_tb/xcache/word_in(1) -radix unsigned} {/cache_tb/xcache/word_in(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/word_in(7) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(6) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(5) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(4) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(3) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(2) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(1) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_in(0) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned}} /cache_tb/xcache/word_in
+add wave -noupdate -expand -group Cache_out -label CCU(r) /cache_tb/xcache/CCU_out
+add wave -noupdate -expand -group Cache_out -label LRU(r) /cache_tb/xcache/LRU_out
+add wave -noupdate -expand -group Cache_out -label dirty(r) /cache_tb/xcache/dirty_out
+add wave -noupdate -expand -group Cache_out -label valid(r) /cache_tb/xcache/valid_out
+add wave -noupdate -expand -group Cache_out -color Firebrick -itemcolor Firebrick -label tag(r) -radix unsigned -childformat {{/cache_tb/xcache/tag_out(7) -radix unsigned} {/cache_tb/xcache/tag_out(6) -radix unsigned} {/cache_tb/xcache/tag_out(5) -radix unsigned} {/cache_tb/xcache/tag_out(4) -radix unsigned} {/cache_tb/xcache/tag_out(3) -radix unsigned} {/cache_tb/xcache/tag_out(2) -radix unsigned} {/cache_tb/xcache/tag_out(1) -radix unsigned} {/cache_tb/xcache/tag_out(0) -radix unsigned}} -subitemconfig {/cache_tb/xcache/tag_out(7) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(6) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(5) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(4) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(3) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(2) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(1) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned} /cache_tb/xcache/tag_out(0) {-color Firebrick -height 15 -itemcolor Firebrick -radix unsigned}} /cache_tb/xcache/tag_out
+add wave -noupdate -expand -group Cache_out -label ctrl(r) /cache_tb/xcache/ctrl_out
+add wave -noupdate -expand -group Cache_out -color {Medium Blue} -itemcolor {Medium Blue} -label word(r) -radix unsigned -childformat {{/cache_tb/xcache/word_out(7) -radix unsigned} {/cache_tb/xcache/word_out(6) -radix unsigned} {/cache_tb/xcache/word_out(5) -radix unsigned} {/cache_tb/xcache/word_out(4) -radix unsigned} {/cache_tb/xcache/word_out(3) -radix unsigned} {/cache_tb/xcache/word_out(2) -radix unsigned} {/cache_tb/xcache/word_out(1) -radix hexadecimal} {/cache_tb/xcache/word_out(0) -radix hexadecimal}} -subitemconfig {/cache_tb/xcache/word_out(7) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(6) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(5) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(4) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(3) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(2) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix unsigned} /cache_tb/xcache/word_out(1) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix hexadecimal} /cache_tb/xcache/word_out(0) {-color {Medium Blue} -height 15 -itemcolor {Medium Blue} -radix hexadecimal}} /cache_tb/xcache/word_out
 add wave -noupdate -label {KO index} /cache_tb/xcache/KO_index
 add wave -noupdate -label {KO index(reg)} /cache_tb/xcache/KO_index_reg
 add wave -noupdate -label {Cache <- wait} /cache_tb/s_waitrequest
@@ -47,7 +51,7 @@ add wave -noupdate -color Firebrick -itemcolor Firebrick -label {CPU offset} -ra
 add wave -noupdate -color Khaki -itemcolor Khaki -label {Cache current state} /cache_tb/xcache/current
 add wave -noupdate -label {Cache init done} /cache_tb/xcache/init_done
 add wave -noupdate -label {Cache hit} /cache_tb/xcache/hit
-add wave -noupdate -label Hits -expand /cache_tb/xcache/hits
+add wave -noupdate -label Hits /cache_tb/xcache/hits
 add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Hit index} -radix unsigned /cache_tb/xcache/hit_index
 add wave -noupdate -color Firebrick -itemcolor Firebrick -label {Hit index(reg)} -radix unsigned /cache_tb/xcache/hit_index_reg
 add wave -noupdate -label {Cache empty slot} /cache_tb/xcache/empty_slot
@@ -68,7 +72,6 @@ add wave -noupdate -label {Cache init enable} /cache_tb/xcache/init_en
 add wave -noupdate -label {Cache init done} /cache_tb/xcache/init_done
 add wave -noupdate -color Firebrick -itemcolor Firebrick -label {init index} -radix unsigned /cache_tb/xcache/init_offset
 add wave -noupdate -color Firebrick -itemcolor Firebrick -label {init offset} -radix unsigned /cache_tb/xcache/init_index
-add wave -noupdate -label {Simu Friend :)} /cache_tb/xcache/simu_friend
 add wave -noupdate /cache_tb/xcache/s_memwrite
 add wave -noupdate -divider ram
 add wave -noupdate -label clk /cache_tb/xmemory/clk
@@ -87,7 +90,7 @@ add wave -noupdate -color Firebrick -itemcolor Firebrick -radix unsigned /cache_
 add wave -noupdate /cache_tb/xmemory/init_done
 add wave -noupdate /cache_tb/xmemory/mem_delay
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {524299495 ps} 0}
+WaveRestoreCursors {{Cursor 1} {529359235 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 236
 configure wave -valuecolwidth 100

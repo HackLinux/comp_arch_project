@@ -23,7 +23,11 @@ package params is
 	constant c : integer; -- cache size = 2^c => c = w+l+a+s
 	constant t : integer; -- number of tag bits = t => RAM size = 2^(t+s+l) words
 	constant r : integer; -- RAM size = 2^r words => r = t+s+l, also number of address bits = r
+	
+	constant mem_b : integer; -- the number of bits needed in cache control for memory syncs 
+	constant ccu_b : integer; -- the number of bits needed in cache control for coherence syncs
 		
+	constant ctrl_length		: integer; -- length of a cache control word in bits
 	constant word_length		: integer; -- length of a RAM word in bits
 	constant words_per_line	: integer; -- number of words per cache line
 	constant lines_per_set	: integer; -- the associativity
@@ -49,7 +53,11 @@ package body params is
 	constant c : integer := 12;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
 	constant t : integer := 12;	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
 	constant r : integer := 19;	-- 4 MB SRAM				-- DEPENDENCIES : the size of memory is a design decision
-		
+	
+	constant mem_b : integer := 2; -- dirty, valid
+	constant ccu_b : integer := 2; -- MSI/MESI enumerations 
+	
+	constant ctrl_length		: integer := t + a + mem_b + ccu_b;
 	constant word_length		: integer := to_integer(unsigned(shift_left(one,w+3)));
 	constant words_per_line	: integer := to_integer(unsigned(shift_left(one,l)));
 	constant lines_per_set	: integer := to_integer(unsigned(shift_left(one,s)));

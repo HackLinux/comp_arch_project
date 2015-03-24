@@ -48,16 +48,16 @@ architecture direct_mapped of cache_final is
 				addr_0				: in  std_logic_vector(s+l-1 downto 0);
 				ctrl_write_0		: in  std_logic;
 				word_write_0		: in	std_logic;
-				ctrl_in_0			: in	std_logic_vector(t+a+1 downto 0);
+				ctrl_in_0			: in	std_logic_vector(ctrl_length-1 downto 0);
 				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_0			: out std_logic_vector(t+a+1 downto 0);
+				ctrl_out_0			: out std_logic_vector(ctrl_length-1 downto 0);
 				word_out_0			: out std_logic_vector(word_length-1 downto 0);
 				addr_1				: in  std_logic_vector(s+l-1 downto 0);
 				ctrl_write_1		: in  std_logic;
 				word_write_1		: in	std_logic;
-				ctrl_in_1			: in	std_logic_vector(t+a+1 downto 0);
+				ctrl_in_1			: in	std_logic_vector(ctrl_length-1 downto 0);
 				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_1			: out std_logic_vector(t+a+1 downto 0);
+				ctrl_out_1			: out std_logic_vector(ctrl_length-1 downto 0);
 				word_out_1			: out std_logic_vector(word_length-1 downto 0)
 			);
 	end component cache_set;
@@ -68,12 +68,13 @@ architecture direct_mapped of cache_final is
 	type state is (reset, init, idle, busy, mem_read, mem_write, write_back, dma);
 	
 	type cache_addr_t		is array (number_of_sets-1 downto 0) of std_logic_vector(s+l-1 downto 0);
-	type cache_ctrl_t		is array (number_of_sets-1 downto 0) of std_logic_vector(t+a+1 downto 0);
+	type cache_ctrl_t		is array (number_of_sets-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 	type cache_word_t		is array (number_of_sets-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 	type cache_tag_t		is array (number_of_sets-1 downto 0) of std_logic_vector(t-1 downto 0);	
 	type cache_index_t	is array (number_of_sets-1 downto 0) of std_logic_vector(s-1 downto 0);	
 	type cache_offset_t	is array (number_of_sets-1 downto 0) of std_logic_vector(l-1 downto 0);
 	type LRU_t				is array (number_of_sets-1 downto 0) of std_logic_vector(a-1 downto 0);
+	type CCU_t				is array (number_of_sets-1 downto 0) of std_logic_vector(ccu_b-1 downto 0);
 
 	signal cache_word_write			: std_logic_vector(number_of_sets-1 downto 0);
 	signal cache_ctrl_write			: std_logic_vector(number_of_sets-1 downto 0);
@@ -92,6 +93,8 @@ architecture direct_mapped of cache_final is
 	signal tag_out						: cache_tag_t;
 	signal LRU_in						: LRU_t;
 	signal LRU_out						: LRU_t;
+	signal CCU_in						: CCU_t;
+	signal CCU_out						: CCU_t;
 	signal cache_index				: cache_index_t;
 	signal cache_offset				: cache_offset_t;
 
@@ -130,11 +133,9 @@ architecture direct_mapped of cache_final is
 	signal hit_write					: std_logic_vector(number_of_sets-1 downto 0);
 	signal empty_write				: std_logic_vector(number_of_sets-1 downto 0);
 	signal KO_write					: std_logic_vector(number_of_sets-1 downto 0);
-	
-	signal simu_friend				: std_logic;
-	
+		
 	constant zero_addr 				: std_logic_vector(s+l-1 downto 0) := (others => '0');
-	constant zero_ctrl 				: std_logic_vector(t+a+1 downto 0) := (others => '0');
+	constant zero_ctrl 				: std_logic_vector(ctrl_length-1 downto 0) := (others => '0');
 	constant zero_word 				: std_logic_vector(word_length-1 downto 0) := (others => '0');
 	signal unused_ctrl				: cache_ctrl_t;
 	signal unused_word				: cache_word_t;
@@ -251,16 +252,6 @@ begin
 				KO_index_reg <= KO_index;
 			end if;
 		end process KO_index_register;
-		
-	simulation_friend:
-		process(clk, rst)
-		begin
-			if(rst = '1') then
-				simu_friend <= '0';
-			elsif(falling_edge(clk)) then
-				simu_friend <= not simu_friend;
-			end if;
-		end process simulation_friend;
 
 	state_assignment:
 		process(clk, rst)
@@ -357,21 +348,25 @@ begin
 	m_index <= m_address(s+l-1 downto l);
 	m_offset <= m_address(l-1 downto 0);	
 	
-	process(cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
+	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
 	begin
 		for i in 0 to number_of_sets-1 loop
-		
+			
+			CCU_in(i) <= (others => '0');
+			
 			cache_addr(i)(s+l-1 downto l) <= cache_index(i);
 			cache_addr(i)(l-1 downto 0) <= cache_offset(i);
 		
-			ctrl_in(i)(t+a+1) <= dirty_in(i);
-			ctrl_in(i)(t+a) <= valid_in(i);
-			ctrl_in(i)(t+a-1 downto t) <= LRU_in(i);
+			ctrl_in(i)(ctrl_length-1 downto ctrl_length-ccu_b) <= CCU_in(i);
+			ctrl_in(i)(t+mem_b+a-1 downto t+mem_b) <= LRU_in(i);
+			ctrl_in(i)(t+mem_b-1) <= dirty_in(i);
+			ctrl_in(i)(t+mem_b-2) <= valid_in(i);
 			ctrl_in(i)(t-1 downto 0) <= tag_in(i);
 		
-			dirty_out(i) <= ctrl_out(i)(t+a+1);
-			valid_out(i) <= ctrl_out(i)(t+a);
-			LRU_out(i) <= ctrl_out(i)(t+a-1 downto t);
+			CCU_out(i) <= ctrl_out(i)(ctrl_length-1 downto ctrl_length-ccu_b);
+			LRU_out(i) <= ctrl_out(i)(t+mem_b+a-1 downto t+mem_b);
+			dirty_out(i) <= ctrl_out(i)(t+mem_b-1);
+			valid_out(i) <= ctrl_out(i)(t+mem_b-2);
 			tag_out(i) <= ctrl_out(i)(t-1 downto 0);
 			
 			if(unsigned(m_tag) = unsigned(tag_out(i))) then

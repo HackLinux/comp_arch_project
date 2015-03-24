@@ -22,23 +22,23 @@ entity cache_set is
 				addr_0				: in  std_logic_vector(s+l-1 downto 0);
 				ctrl_write_0		: in  std_logic;
 				word_write_0		: in	std_logic;
-				ctrl_in_0			: in	std_logic_vector(t+a+1 downto 0);
+				ctrl_in_0			: in	std_logic_vector(ctrl_length-1 downto 0);
 				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_0			: out std_logic_vector(t+a+1 downto 0);
+				ctrl_out_0			: out std_logic_vector(ctrl_length-1 downto 0);
 				word_out_0			: out std_logic_vector(word_length-1 downto 0);
 				addr_1				: in  std_logic_vector(s+l-1 downto 0);
 				ctrl_write_1		: in  std_logic;
 				word_write_1		: in	std_logic;
-				ctrl_in_1			: in	std_logic_vector(t+a+1 downto 0);
+				ctrl_in_1			: in	std_logic_vector(ctrl_length-1 downto 0);
 				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_1			: out std_logic_vector(t+a+1 downto 0);
+				ctrl_out_1			: out std_logic_vector(ctrl_length-1 downto 0);
 				word_out_1			: out std_logic_vector(word_length-1 downto 0)
 			);
 end cache_set;
 
 architecture modelsim of cache_set is 
 
-	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(t+a+1 downto 0);
+	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 
 	type line_data is array (words_per_line-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 	type cache_data is array (lines_per_set-1 downto 0) of line_data;
@@ -118,7 +118,7 @@ end modelsim;
 
 --architecture quartus of cache_set is 
 --
---	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(t+a+1 downto 0);
+--	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 --
 --	type line_data is array (words_per_line-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 --	type cache_data is array (lines_per_set-1 downto 0) of line_data;
