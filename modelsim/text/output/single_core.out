@@ -1,0 +1,5 @@
+Basic tests took 2588 clock cycles
+Storing arrays took 216 clock cycles
+Verifying arrays took 256 clock cycles
+Adding arrays took 190 clock cycles
+Verifying sum took 177 clock cycles

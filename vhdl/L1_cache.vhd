@@ -52,21 +52,21 @@ end cache_final;
 architecture direct_mapped of cache_final is
 	
 	component cache_set is
-	port	(	clk					: in  std_logic;
-				addr_0				: in  std_logic_vector(s+l-1 downto 0);
-				ctrl_write_0		: in  std_logic;
-				word_write_0		: in	std_logic;
-				ctrl_in_0			: in	std_logic_vector(ctrl_length-1 downto 0);
-				word_in_0			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_0			: out std_logic_vector(ctrl_length-1 downto 0);
-				word_out_0			: out std_logic_vector(word_length-1 downto 0);
-				addr_1				: in  std_logic_vector(s+l-1 downto 0);
-				ctrl_write_1		: in  std_logic;
-				word_write_1		: in	std_logic;
-				ctrl_in_1			: in	std_logic_vector(ctrl_length-1 downto 0);
-				word_in_1			: in	std_logic_vector(word_length-1 downto 0);
-				ctrl_out_1			: out std_logic_vector(ctrl_length-1 downto 0);
-				word_out_1			: out std_logic_vector(word_length-1 downto 0)
+	port	(	clk				: in  std_logic;
+				addr_0			: in  std_logic_vector(s+l-1 downto 0);
+				ctrl_write_0	: in  std_logic;
+				word_write_0	: in	std_logic;
+				ctrl_in_0		: in	std_logic_vector(ctrl_length-1 downto 0);
+				word_in_0		: in	std_logic_vector(word_length-1 downto 0);
+				ctrl_out_0		: out std_logic_vector(ctrl_length-1 downto 0);
+				word_out_0		: out std_logic_vector(word_length-1 downto 0);
+				addr_1			: in  std_logic_vector(s+l-1 downto 0);
+				ctrl_write_1	: in  std_lovgic;
+				word_write_1	: in	std_logic;
+				ctrl_in_1		: in	std_logic_vector(ctrl_length-1 downto 0);
+				word_in_1		: in	std_logic_vector(word_length-1 downto 0);
+				ctrl_out_1		: out std_logic_vector(ctrl_length-1 downto 0);
+				word_out_1		: out std_logic_vector(word_length-1 downto 0)
 			);
 	end component cache_set;
 	

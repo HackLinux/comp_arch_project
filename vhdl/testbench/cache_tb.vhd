@@ -1,5 +1,7 @@
+use std.textio.all;
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_textio.all;
 use ieee.numeric_std.all;
 use work.params.all;
 
@@ -57,7 +59,7 @@ architecture behaviour of cache_tb is
 	signal s_memread		: std_logic := '0';
 	signal s_readdata		: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal s_waitrequest	: std_logic := '1';
-
+	
 begin
 	 
     --dut => Device Under Test
@@ -73,187 +75,194 @@ begin
     end process;
 
     test_process : process
-    begin
-    	rst <= '1';
-		m_address <= (others => '0');
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '0';
-    	wait for 3*clock_period;
-		wait until rising_edge(clk);
-		rst <= '0';
+	 
+		variable start				: time := 0 ns;
+		variable finish			: time := 0 ns;
+		variable readdata			: integer := 0;
 		
-		-------------
-		--Read Miss--
-		-------------
-		m_address <= std_logic_vector(to_unsigned(9, r));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
+		variable out_line : line;
+		file out_file : text is out ("./text/output/single_core.out");
 		
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
+		procedure reset is
+		begin
 		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(9, word_length)) report "Test 1 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
+			rst <= '1';
 		
-		------------
-		--Read Hit--
-		------------
-		m_address <= std_logic_vector(to_unsigned(10, r));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
-
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(10, word_length)) report "Test 2 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-
+			m_address <= (others => '0');
+			m_writedata <= (others => '0');
+			m_memwrite <= '0';
+			m_memread <= '0';
+			wait for 3*clock_period;
+			wait until rising_edge(clk);
+			rst <= '0';
 		
-		-------------
-		--Write Hit--
-		-------------
-		m_address <= std_logic_vector(to_unsigned(9, r));
-		m_writedata <= std_logic_vector(to_unsigned(21, word_length));
-		m_memwrite <= '1';
-		m_memread <= '0';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
+		end reset;
 		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(21, word_length)) report "Test 3 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-		
-		--------------
-		--Write Miss--
-		--------------
-		m_address <= std_logic_vector(to_unsigned(13, r));
-		m_writedata <= std_logic_vector(to_unsigned(21, word_length));
-		m_memwrite <= '1';
-		m_memread <= '0';
-
---		--DEBOUNCE--
---		wait until falling_edge(m_waitrequest);
---		wait for clock_period/10;
---		
-		
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
-		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(21, word_length)) report "Test 4 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-		
-		-----------------------------
-		--Read Miss with Write Back--
-		-----------------------------
-		m_address <= std_logic_vector(to_unsigned((cache_size-1)+9, r));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
-		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned((cache_size-1)+9, word_length)) report "Test 5 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-		
-		------------------------
-		--Restore Test 3 and 4--
-		------------------------
-		m_address <= std_logic_vector(to_unsigned(9, r));
-		m_writedata <= std_logic_vector(to_unsigned(9, word_length));
-		m_memwrite <= '1';
-		m_memread <= '0';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
-		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(9, word_length)) report "Restore 3 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-		
-		m_address <= std_logic_vector(to_unsigned(13, r));
-		m_writedata <= std_logic_vector(to_unsigned(13, word_length));
-		m_memwrite <= '1';
-		m_memread <= '0';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_writedata <= (others => '0');
-		m_memwrite <= '0';
-		m_memread <= '1';
-
-		--wait until rising_edge(m_waitrequest);
-		wait until (rising_edge(clk) and (m_waitrequest = '0'));
-		m_memread <= '0';
-		
-		wait until rising_edge(clk);
-		assert m_readdata = std_logic_vector(to_unsigned(13, word_length)) report "Restore 4 failed" severity error;
-		wait for 2*clock_period;
-		wait until rising_edge(clk);
-		
-		----------------------------------
-		--Loop through the entire memory--
-		----------------------------------
-		m_memwrite <= '0';
-		for i in 0 to ram_size-1 loop
-			m_address <= std_logic_vector(to_unsigned(i, r));
+    	procedure read_addr(addr : in integer) is
+		begin
+			m_address <= std_logic_vector(to_unsigned(addr, r));
+			m_writedata <= (others => '0');
+			m_memwrite <= '0';
 			m_memread <= '1';
-			
---			
---			--DEBOUNCE--
---			wait until falling_edge(m_waitrequest);
---			wait for clock_period/10;
---			
---			
+		
 			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest = '0'));
 			m_memread <= '0';
-			m_address <= std_logic_vector(to_unsigned(0, r));
-
-			wait until rising_edge(clk);
-			assert m_readdata = std_logic_vector(to_unsigned(i, word_length)) report "Loop Failure" severity error;
-			wait until rising_edge(clk);
+			m_address <= (others => '0');
 			
-		end loop;
+			wait until rising_edge(clk);
+			readdata := to_integer(unsigned(m_readdata));
+		end read_addr;
 		
+		procedure write_addr(addr : in integer; writedata : in integer) is
+		begin
+			m_address <= std_logic_vector(to_unsigned(addr, r));
+			m_writedata <= std_logic_vector(to_unsigned(writedata, word_length));
+			m_memwrite <= '1';
+			m_memread <= '0';
+		
+			--wait until rising_edge(m_waitrequest);
+			wait until (rising_edge(clk) and (m_waitrequest = '0'));
+			m_memwrite <= '0';
+			m_writedata <= (others => '0');
+			m_address <= (others => '0');
+			
+		end write_addr;
+		
+		procedure assert_data(correct_data : in integer) is
+		begin
+			assert readdata = correct_data report "Assert Failed" severity Failure;			
+		end assert_data;
+		
+		procedure write_file(str : in string) is
+		begin
+			write(out_line, str);
+			writeline(out_file, out_line);
+		end write_file;
+		
+		procedure write_time(test : in string) is
+		begin
+			write(out_line, test & " took " & integer'image((finish-start)/clock_period) & " clock cycles");
+			writeline(out_file, out_line);
+		end write_time;
+		
+		procedure basic_tests is
+		begin
+			
+			write_addr(9,9);
+			read_addr(9);
+			assert_data(9);
+
+			write_addr(10,10);
+			read_addr(10);
+			assert_data(10);
+
+			for i in 0 to 100 loop
+
+				write_addr(i,i);
+				read_addr(i);
+				assert_data(i);
+			
+			end loop;
+			
+		end basic_tests;
+		
+		procedure store_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
+			variable l : line;
+			file f : text is in ("./text/input/" & array_file);
+			variable a1 : integer;
+			variable space : character;
+			variable a2 : integer;
+		begin
+			for i in 0 to array_length-1 loop
+				readline(f, l);
+				read(l, a1);
+				read(l, space);
+				read(l, a2);
+				write_addr(start_addr+i,a1);
+				write_addr(start_addr+array_length+i,a2);
+			end loop;
+		end store_arrays;
+		
+		procedure assert_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
+			variable l : line;
+			file f : text is in ("./text/input/" & array_file);
+			variable a1 : integer;
+			variable space : character;
+			variable a2 : integer;
+		begin
+			for i in 0 to array_length-1 loop
+				readline(f, l);
+				read(l, a1);
+				read(l, space);
+				read(l, a2);
+				read_addr(start_addr+i);
+				assert_data(a1);
+				read_addr(start_addr+array_length+i);
+				assert_data(a2);
+			end loop;
+		end assert_arrays;
+		
+		procedure add_arrays(array_length : in integer ; start_addr : in integer) is
+			variable a1 : integer;
+			variable a2 : integer;
+		begin
+			for i in 0 to array_length-1 loop
+				read_addr(start_addr+i);
+				a1 := readdata;
+				read_addr(start_addr+array_length+i);
+				a2 := readdata;
+				write_addr(start_addr+array_length+array_length+i,(a1+a2));
+			end loop;
+		end add_arrays;
+		
+		procedure verify_sum(sum_file : in string ; array_length : in integer ; start_addr : in integer) is
+			variable l : line;
+			file f : text is in ("./text/input/" & sum_file);
+			variable r : integer;
+		begin
+			for i in 0 to array_length-1 loop
+				readline(f, l);
+				read(l, r);
+				read_addr(start_addr+array_length+array_length+i);
+				assert_data(r);
+			end loop;
+		end verify_sum;
+		
+	 begin
+		
+		reset;
+		
+		start := now;
+		basic_tests;
+		finish := now;
+		
+		write_time("Basic tests");
+		
+		start := now;
+		store_arrays("array10.in",10,100);
+		finish := now;
+		
+		write_time("Storing arrays");
+		
+		start := now;
+		assert_arrays("array10.in",10,100);
+		finish := now;
+		
+		write_time("Verifying arrays");
+		
+		start := now;
+		add_arrays(10,100);
+		finish := now;
+		
+		write_time("Adding arrays");
+		
+		start := now;
+		verify_sum("array10_result.in",10,100);
+		finish := now;
+		
+		write_time("Verifying sum");
+
 		
 		wait;
 

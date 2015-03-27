@@ -6,6 +6,8 @@
 !*.vhd
 !*.vhdl
 !*.do
+!*.out
+!*.in
 
 # ...even if they are in subdirectories
 !*/

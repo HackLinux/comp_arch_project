@@ -37,7 +37,7 @@ architecture rtl of memory is
 			);
 	end component ram;
 
-	type state is (reset, init, idle, busy);
+	type state is (reset, idle, busy);
 	
 	signal current	: state := reset;
 		
@@ -45,34 +45,14 @@ architecture rtl of memory is
 	signal memwrite		: std_logic;
 	
 	signal address			: std_logic_vector(r-1 downto 0);
-	signal init_addr		: integer range 0 to ram_size;
 		
-	signal init_done		: std_logic;
 	signal mem_delay		: integer;
-	signal init_rst		: std_logic;
 	signal delay_rst		: std_logic;
 	signal delay_done		: std_logic;
 	
 begin
 	
-	--init_addr_int <= to_integer(init_addr);
-	init_done <= '1' when init_addr = (ram_size-1) else '0';
 	delay_done <= '1' when mem_delay = mem_delay_cycles else '0';
-	
-	process(clk, rst)
-	begin
-		if(rst = '1') then
-			init_addr <= 0;
-		elsif(rising_edge(clk)) then
-			if(init_rst = '1') then
-				init_addr <= 0;
-			else
-				init_addr <= init_addr + 1;
-			end if;
-		end if;
-		
-	end process;
-	
 	
 	process(clk, rst)
 	begin
@@ -99,14 +79,7 @@ begin
 				case current is
 					
 					when reset =>
-							current <= init;
-					
-					when init =>
-						if(init_done = '1') then
 							current <= idle;
-						else
-							current <= init;
-						end if;
 				
 					when idle =>
 						if((s_memread xor s_memwrite) = '1') then -- there can be only one
@@ -127,7 +100,7 @@ begin
 		end process state_assignment;
 	
 	output_assignments:
-		process(current, init_addr, s_writedata, s_address, mem_delay, s_memwrite)
+		process(current, s_writedata, s_address, mem_delay, s_memwrite)
 		begin
 			case current is
 				
@@ -136,15 +109,6 @@ begin
 					address <= (others => '0');
 					memwrite <= '0';
 					s_waitrequest <= '1';
-					init_rst <= '1';
-					delay_rst <= '1';
-				
-				when init =>
-					writedata <= std_logic_vector(to_unsigned(init_addr, word_length));
-					address <= std_logic_vector(to_unsigned(init_addr, r));
-					memwrite <= '1';
-					s_waitrequest <= '1';
-					init_rst <= '0';
 					delay_rst <= '1';
 					
 				when idle =>
@@ -152,7 +116,6 @@ begin
 					address <= (others => '0');
 					memwrite <= '0';
 					s_waitrequest <= '1';
-					init_rst <= '1';
 					delay_rst <= '1';
 				
 				when busy =>
@@ -165,7 +128,6 @@ begin
 						memwrite <= '0';
 						s_waitrequest <= '1';
 					end if;
-					init_rst <= '1';
 					delay_rst <= '0';
 					
 			end case;

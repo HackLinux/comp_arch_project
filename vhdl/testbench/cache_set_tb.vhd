@@ -45,6 +45,10 @@ architecture a0 of cache_set_tb is
 	signal ctrl_out_1			: std_logic_vector(ctrl_length-1 downto 0) := (others => '0');
 	signal word_out_1			: std_logic_vector(word_length-1 downto 0) := (others => '0');
 	
+	signal start				: time := 0 ps;
+	signal finish				: time := 0 ps;
+	signal lapse				: time := 0 ps;
+	
 	procedure set_stim
 		(	pin_addr_0						: in integer;
 			pin_ctrl_write_0				: in integer;
@@ -118,6 +122,7 @@ architecture a0 of cache_set_tb is
 	stim:
 		process
 		begin
+			start <= now;
 			set_stim(0,1,1,21,21,20,1,1,3,3,addr_0, ctrl_write_0, word_write_0, ctrl_in_0, word_in_0, addr_1, ctrl_write_1, word_write_1, ctrl_in_1, word_in_1);
 			wait for 2*clock_period;
 			set_stim(20,0,0,0,0,0,0,0,0,0,addr_0, ctrl_write_0, word_write_0, ctrl_in_0, word_in_0, addr_1, ctrl_write_1, word_write_1, ctrl_in_1, word_in_1);
@@ -126,6 +131,8 @@ architecture a0 of cache_set_tb is
 			wait for 2*clock_period;
 			set_stim(2,1,1,2,2,2,0,0,0,0,addr_0, ctrl_write_0, word_write_0, ctrl_in_0, word_in_0, addr_1, ctrl_write_1, word_write_1, ctrl_in_1, word_in_1);
 			wait for 2*clock_period;
+			finish <= now;
+			lapse <= finish - start;
 			wait;
 		end process stim;
 	
