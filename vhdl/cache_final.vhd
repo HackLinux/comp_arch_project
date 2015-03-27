@@ -119,7 +119,7 @@ architecture direct_mapped of cache_final is
 	signal empty_slot					: std_logic;
 	signal dma_req						: std_logic;
 	signal dma_req_reg				: std_logic;
-	signal ds_waitrequest			: std_logic;
+	signal s_waitrequest_reg		: std_logic;
 	signal word_rst					: std_logic;
 	signal LRU_update					: std_logic;
 	signal word_number				: unsigned(l-1 downto 0);
@@ -151,11 +151,11 @@ begin
 		process(clk, rst)
 		begin
 			if(rst = '1') then
-				ds_waitrequest <= '1';
+				s_waitrequest_reg <= '1';
 			elsif(rising_edge(clk)) then
 				
 				-- delay s_waitrequest to disable s_memread in write_back state
-				ds_waitrequest <= s_waitrequest;
+				s_waitrequest_reg <= s_waitrequest;
 
 			end if;
 		end process ds_wait;
@@ -300,7 +300,7 @@ begin
 						end if;
 					
 					when mem_read => 
-						if((ds_waitrequest = '0') and (dword_number = words_per_line-1)) then
+						if((s_waitrequest_reg = '0') and (dword_number = words_per_line-1)) then
 							current <= busy;
 						else
 							current <= mem_read;
@@ -348,7 +348,7 @@ begin
 	m_index <= m_address(s+l-1 downto l);
 	m_offset <= m_address(l-1 downto 0);	
 	
-	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, ds_waitrequest, s_waitrequest, init_en, hit, empty_slot)
+	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot)
 	begin
 		for i in 0 to number_of_sets-1 loop
 			
@@ -448,7 +448,7 @@ begin
 			end if;
 			
 			if(i = empty_index_reg) then
-				empty_write(i) <= not ds_waitrequest;
+				empty_write(i) <= not s_waitrequest_reg;
 			else
 				empty_write(i) <= '0';
 			end if;
@@ -467,7 +467,7 @@ begin
 	
 		
 	output_assignments:
-		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, ds_waitrequest, KO_write, KO_index_reg, m_memread, hit_reg, hit_write)
+		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, s_waitrequest_reg, KO_write, KO_index_reg, m_memread, hit_reg, hit_write)
 		begin
 			case current is
 				
@@ -678,7 +678,7 @@ begin
 					cache_word_write <= empty_write;
 					cache_ctrl_write <= empty_write;
 					
-					--cache_write_2 <= ((not ds_waitrequest) and (hit_2 or (not dirty_out_2))) and (not lru_reg);
+					--cache_write_2 <= ((not s_waitrequest_reg) and (hit_2 or (not dirty_out_2))) and (not lru_reg);
 					
 					----------------------
 					----master outputs----
@@ -689,7 +689,7 @@ begin
 					---------------------
 					----slave outputs----
 					---------------------
-					if((dword_number = (words_per_line-1)) and ((s_waitrequest = '0') or (ds_waitrequest = '0'))) then
+					if((dword_number = (words_per_line-1)) and ((s_waitrequest = '0') or (s_waitrequest_reg = '0'))) then
 						s_memread <= '0';
 					else
 						s_memread <= '1';
@@ -767,7 +767,7 @@ begin
 					----slave outputs----
 					---------------------
 					s_memread <= '0';
-					s_memwrite <= ds_waitrequest;
+					s_memwrite <= s_waitrequest_reg;
 					
 					s_address(r-1 downto s+l) <= tag_out(KO_index_reg);
 					s_writedata <= word_out(KO_index_reg);
