@@ -5,11 +5,7 @@
 --
 -- brief	   : the cache 
 
--- FIX 		: Write back for non dirty LRU lines
---				  in the associative case for filled 
---				  sets
---
---				  Ctrl write in the mem_read and 
+-- FIX 		: Ctrl write in the mem_read and 
 --				  write_back should only happen once
 --				  pref. right at the start
 --************************************************
@@ -348,7 +344,7 @@ begin
 	m_index <= m_address(s+l-1 downto l);
 	m_offset <= m_address(l-1 downto 0);	
 	
-	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot)
+	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot)
 	begin
 		for i in 0 to number_of_sets-1 loop
 			
@@ -378,7 +374,11 @@ begin
 			if(a = 0) then
 				empty_slots(i) <= not dirty_out(i);
 			else
-				empty_slots(i) <= not valid_out(i);
+				if(i = KO_index) then
+					empty_slots(i) <= not dirty_out(i);
+				else
+					empty_slots(i) <= not valid_out(i);
+				end if;
 			end if;
 			
 			if(init_en	= '1') then
@@ -417,17 +417,16 @@ begin
 					hit_index <= hit_index_reg;
 				end if;
 				
-				if(empty_slot = '1') then
+				if(unsigned(empty_slots) /= 0) then
 					if(empty_slots(i) = '1') then
 						empty_index <= i;
 					end if;
-					
-					if(unsigned(LRU_in(i)) = number_of_sets-1) then
-						KO_index <= i;
-					end if;
-				else
+				else					
 					empty_index <= empty_index_reg;
-					KO_index <= KO_index_reg;
+				end if;
+				
+				if(unsigned(LRU_out(i)) = number_of_sets-1) then
+					KO_index <= i;
 				end if;
 				
 			else
@@ -464,7 +463,6 @@ begin
 
 	hit <=  '0' when unsigned(hits) = 0 else '1';
 	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
-	
 		
 	output_assignments:
 		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, s_waitrequest_reg, KO_write, KO_index_reg, m_memread, hit_reg, hit_write)

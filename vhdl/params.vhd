@@ -51,7 +51,7 @@ package body params is
 	constant a : integer := 1 ;	-- 8-way associative		-- DEPENDENCIES : a = c-w-l-s
 	constant s : integer := 7 ;	-- 32 sets 					-- DEPENDENCIES : s = c-w-l-a
 	constant c : integer := 12;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
-	constant t : integer := 10;	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
+	constant t : integer := 10; 	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
 	constant r : integer := 19;	-- 4 MB SRAM				-- DEPENDENCIES : the size of memory is a design decision
 	
 	constant mem_b : integer := 2; -- dirty, valid

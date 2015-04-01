@@ -157,13 +157,16 @@ begin
 			read_addr(10);
 			assert_data(10);
 
-			for i in 0 to 100 loop
-
+			for i in 0 to 4095  loop
 				write_addr(i,i);
+			end loop;
+			
+			for i in 0 to 4095  loop
 				read_addr(i);
 				assert_data(i);
-			
 			end loop;
+			
+				
 			
 		end basic_tests;
 		
@@ -245,11 +248,11 @@ begin
 		
 		write_time("Storing arrays");
 		
-		start := now;
-		assert_arrays("array10.in",10,100);
-		finish := now;
+		--start := now;
+		--assert_arrays("array10.in",10,100);
+		--finish := now;
 		
-		write_time("Verifying arrays");
+		--write_time("Verifying arrays");
 		
 		start := now;
 		add_arrays(10,100);
