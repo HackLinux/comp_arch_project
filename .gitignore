@@ -8,6 +8,7 @@
 !*.do
 !*.out
 !*.in
+!*.c
 
 # ...even if they are in subdirectories
 !*/
