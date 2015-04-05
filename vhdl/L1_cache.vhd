@@ -29,7 +29,7 @@ entity L1_cache is
 				m_address_opposite		: in  std_logic_vector(r-1 downto 0);
 				m_memwrite_opposite		: in  std_logic;
 				m_memread_opposite		: in  std_logic;
-				m_waitrequest_opposite	: out std_logic;
+				m_ready_opposite			: out std_logic;
 				
 				-- I/O interface for memory
 				s_writedata					: out std_logic_vector (word_length-1 downto 0);
@@ -65,7 +65,7 @@ architecture direct_mapped of L1_cache is
 	--for all: cache_set use entity work.cache_set(modelsim);
 	
 	-- the states for the mem_state machine that implements the cache funtionality
-	type mem_state is (mem_reset, mem_init, idle, busy, mem_read, mem_write, write_back, dma);
+	type mem_state is (mem_reset, mem_init, mem_idle, busy, mem_read, mem_write, write_back, dma);
 	
 	-- the states for the ccu_state machine that implements the coherence funtionality
 	type ccu_state is (ccu_reset, ccu_init, ccu, ccu_write_back);
@@ -287,25 +287,25 @@ begin
 					
 					when mem_init =>
 						if(init_done = '1') then
-							mem_current <= idle;
+							mem_current <= mem_idle;
 						else
 							mem_current <= mem_init;
 						end if;
 				
-					when idle =>
+					when mem_idle =>
 						if(dma_req = '1') then
 							mem_current <= dma;
 						elsif((m_memread_matched xor m_memwrite_matched) = '1') then -- there can be only one
 							mem_current <= busy;
 						else
-							mem_current <= idle;
+							mem_current <= mem_idle;
 						end if;
 					
 					when busy =>
 						
 						-- read/write hits
 						if(hit = '1') then
-							mem_current <= idle;
+							mem_current <= mem_idle;
 						
 						-- write miss
 						elsif(m_memwrite_matched = '1') then
@@ -329,7 +329,7 @@ begin
 						
 					when mem_write =>
 						if(s_waitrequest = '0') then
-							mem_current <= idle;
+							mem_current <= mem_idle;
 						else
 							mem_current <= mem_write;
 						end if;
@@ -343,7 +343,7 @@ begin
 						
 					when dma =>
 						if(s_waitrequest = '0') then
-							mem_current <= idle;
+							mem_current <= mem_idle;
 						else
 							mem_current <= dma;
 						end if;
@@ -575,7 +575,7 @@ begin
 					init_en <= '1';
 					LRU_update <= '0';
 				
-				when idle =>
+				when mem_idle =>
 					
 					-----------------------------
 					----cache control outputs----

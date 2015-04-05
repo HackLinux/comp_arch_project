@@ -37,7 +37,7 @@ entity cache_final is
 			);
 end cache_final;
 
-architecture direct_mapped of cache_final is
+architecture a of cache_final is
 	
 	component cache_set is
 	port	(	clk					: in  std_logic;
@@ -832,4 +832,4 @@ begin
 			end case;
 		end process output_assignments;
 
-end direct_mapped;
+end a;
