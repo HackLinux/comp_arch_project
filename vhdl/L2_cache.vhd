@@ -41,7 +41,7 @@ entity L2_cache is
 			);
 end L2_cache;
 
-architecture a of L2_cache is
+architecture a0 of L2_cache is
 	
 	component cache_set is
 	port	(	clk					: in  std_logic;
@@ -855,4 +855,4 @@ begin
 			end case;
 		end process output_assignments;
 
-end a;
+end a0;

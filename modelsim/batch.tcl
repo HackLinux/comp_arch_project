@@ -1,36 +1,56 @@
 proc c  {} {
+    # compile all VHDs in proper order
     echo "---------------STARTED COMPILING---------------------------"
-    vcom ../vhdl/cache_final.vhd
-    vcom ../vhdl/cache_set.vhd 
-    vcom ../vhdl/L1_cache.vhd
-    vcom ../vhdl/L2_cache.vhd
-    vcom ../vhdl/memory.vhd
     vcom ../vhdl/params.vhd
     vcom ../vhdl/ram.vhd
+    vcom ../vhdl/memory.vhd
+    vcom ../vhdl/testbench/memory_tb.vhd 
+    
+    vcom ../vhdl/cache_set.vhd 
     vcom ../vhdl/testbench/cache_set_tb.vhd
-    vcom ../vhdl/testbench/cache_tb.vhd
-    vcom ../vhdl/testbench/memory_tb.vhd              
+    
+    vcom ../vhdl/cache_final.vhd
+    vcom ../vhdl/testbench/cache_tb.vhd 
+    
+    vcom ../vhdl/L1_cache.vhd
+    vcom ../vhdl/L2_cache.vhd
+    # vcom ../vhdl/testbench/L1_cache_tb.vhd
+    # vcom ../vhdl/testbench/L2_cache_tb.vhd           
     echo "---------------FINISHED COMPILING--------------------------"
 }
  
-proc r  {} {    
+proc r  {tb} {    
     # open simulation
     echo "---------------STARTED RUNNING---------------------------"
-    vsim work.memory_tb
-    add wave *
+    echo $tb
+    vsim work.$tb
+    do wave/$tb.do
     restart
     
     # add a breakpoint to the line which contains
     # the stopping point
-    set fp [open "../vhdl/testbench/memory_tb.vhd" r]
+    set path "../vhdl/testbench/"
+    set ext ".vhd"
+    set filename $path$tb$ext
+    echo ""
+    echo ""
+    echo ""
+    echo ""
+    echo $filename
+    echo ""
+    echo ""
+    echo ""
+    echo ""
+    set fp [open $filename r]
     set filecontent [read $fp]
     set input_list [split $filecontent "\n"]
     set stopping_point "rst <=*"
     set line [lsearch -regexp $input_list $stopping_point]
     set line [expr $line + 1]
-    bp ../vhdl/testbench/memory_tb.vhd $line
+    bp $filename $line
     
     # start the simulation
+    # (run until breakpoint)
     run -all
     echo "---------------FINISHED RUNNING--------------------------"
 }
@@ -43,5 +63,5 @@ proc Q  {} {
 }
 
 #comment?
-c
-r
+#c
+r "cache_tb"
