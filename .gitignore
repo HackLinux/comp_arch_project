@@ -9,6 +9,7 @@
 !*.out
 !*.in
 !*.c
+!*.tcl
 
 # ...even if they are in subdirectories
 !*/
