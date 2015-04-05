@@ -119,7 +119,7 @@ architecture direct_mapped of cache_final is
 	signal word_rst					: std_logic;
 	signal LRU_update					: std_logic;
 	signal word_number				: unsigned(l-1 downto 0);
-	signal dword_number				: unsigned(l-1 downto 0);
+	signal word_number_reg			: unsigned(l-1 downto 0);
 	signal hit_index					: integer range 0 to number_of_sets-1;
 	signal hit_index_reg				: integer range 0 to number_of_sets-1;
 	signal empty_index				: integer range 0 to number_of_sets-1;
@@ -127,8 +127,10 @@ architecture direct_mapped of cache_final is
 	signal KO_index					: integer range 0 to number_of_sets-1;
 	signal KO_index_reg				: integer range 0 to number_of_sets-1;
 	signal hit_write					: std_logic_vector(number_of_sets-1 downto 0);
-	signal empty_write				: std_logic_vector(number_of_sets-1 downto 0);
-	signal KO_write					: std_logic_vector(number_of_sets-1 downto 0);
+	signal word_write_empty			: std_logic_vector(number_of_sets-1 downto 0);
+	signal word_write_KO				: std_logic_vector(number_of_sets-1 downto 0);
+	signal ctrl_write_empty			: std_logic_vector(number_of_sets-1 downto 0);
+	signal ctrl_write_KO				: std_logic_vector(number_of_sets-1 downto 0);
 		
 	constant zero_addr 				: std_logic_vector(s+l-1 downto 0) := (others => '0');
 	constant zero_ctrl 				: std_logic_vector(ctrl_length-1 downto 0) := (others => '0');
@@ -185,7 +187,7 @@ begin
 		begin
 			if(rst = '1') then
 				word_number <= (others => '0');
-				dword_number <= (others => '0');
+				word_number_reg <= (others => '0');
 			elsif(rising_edge(clk)) then
 				if(word_rst = '1') then
 					word_number <= (others => '0');
@@ -194,7 +196,7 @@ begin
 				end if;
 				
 				-- double register the word number
-				dword_number <= word_number;
+				word_number_reg <= word_number;
 			end if;
 		
 		end process word_counter;
@@ -296,7 +298,7 @@ begin
 						end if;
 					
 					when mem_read => 
-						if((s_waitrequest_reg = '0') and (dword_number = words_per_line-1)) then
+						if((s_waitrequest_reg = '0') and (word_number_reg = words_per_line-1)) then
 							current <= busy;
 						else
 							current <= mem_read;
@@ -447,15 +449,27 @@ begin
 			end if;
 			
 			if(i = empty_index_reg) then
-				empty_write(i) <= not s_waitrequest_reg;
+				word_write_empty(i) <= not s_waitrequest_reg;
+				if(word_number_reg = 0) then
+					ctrl_write_empty(i) <= not s_waitrequest_reg;
+				else
+					ctrl_write_empty(i) <= '0';
+				end if;
 			else
-				empty_write(i) <= '0';
+				word_write_empty(i) <= '0';
+				ctrl_write_empty(i) <= '0';
 			end if;
 			
 			if(i = KO_index_reg) then
-				KO_write(i) <= not s_waitrequest;
+				word_write_KO(i) <= not s_waitrequest;
+				if(word_number_reg = 0) then
+					ctrl_write_KO(i) <= not s_waitrequest_reg;
+				else
+					ctrl_write_KO(i) <= '0';
+				end if;
 			else
-				KO_write(i) <= '0';
+				word_write_KO(i) <= '0';
+				ctrl_write_KO(i) <= '0';
 			end if;
 		
 		end loop;
@@ -465,7 +479,7 @@ begin
 	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
 		
 	output_assignments:
-		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, s_waitrequest_reg, KO_write, KO_index_reg, m_memread, hit_reg, hit_write)
+		process(current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, word_out, hit_index_reg, m_memwrite, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out, valid_out, tag_out, word_number, m_address, m_writedata, empty_slot, m_tag, word_number_reg, word_write_empty, ctrl_write_empty, s_waitrequest, s_waitrequest_reg, word_write_KO, ctrl_write_KO, KO_index_reg, m_memread, hit_reg, hit_write)
 		begin
 			case current is
 				
@@ -672,9 +686,9 @@ begin
 					tag_in <= (others => m_tag);
 					word_in <= (others => s_readdata);
 					cache_index <= (others => m_index);
-					cache_offset <= (others => std_logic_vector(dword_number));
-					cache_word_write <= empty_write;
-					cache_ctrl_write <= empty_write;
+					cache_offset <= (others => std_logic_vector(word_number_reg));
+					cache_word_write <= word_write_empty;
+					cache_ctrl_write <= ctrl_write_empty;
 					
 					--cache_write_2 <= ((not s_waitrequest_reg) and (hit_2 or (not dirty_out_2))) and (not lru_reg);
 					
@@ -687,7 +701,7 @@ begin
 					---------------------
 					----slave outputs----
 					---------------------
-					if((dword_number = (words_per_line-1)) and ((s_waitrequest = '0') or (s_waitrequest_reg = '0'))) then
+					if((word_number_reg = (words_per_line-1)) and ((s_waitrequest = '0') or (s_waitrequest_reg = '0'))) then
 						s_memread <= '0';
 					else
 						s_memread <= '1';
@@ -752,8 +766,8 @@ begin
 					word_in <= (others => (others => '0'));
 					cache_index <= (others => m_index);
 					cache_offset <= (others => std_logic_vector(word_number));				
-					cache_word_write <= KO_write;
-					cache_ctrl_write <= KO_write;
+					cache_word_write <= word_write_KO;
+					cache_ctrl_write <= ctrl_write_KO;
 					
 					----------------------
 					----master outputs----

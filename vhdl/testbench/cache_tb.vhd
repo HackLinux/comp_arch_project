@@ -15,6 +15,8 @@
 --				  Reversing an array
 --
 --				  Sorting an array (bubble+merge)
+--
+--				  run until a signal (modelsim autorun)
 --************************************************
 
 use std.textio.all;

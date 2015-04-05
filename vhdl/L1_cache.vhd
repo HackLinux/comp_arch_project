@@ -5,9 +5,7 @@
 --
 -- brief	   : the cache 
 
--- FIX 		: Ctrl write in the mem_read and 
---				  write_back should only happen once
---				  pref. right at the start
+-- FIX 		: 
 --************************************************
 
 library ieee;
@@ -100,6 +98,26 @@ architecture direct_mapped of L1_cache is
 	signal CCU_out_matched				: CCU_t;
 	signal cache_index_matched			: cache_index_t;
 	signal cache_offset_matched		: cache_offset_t;
+	
+	signal cache_word_write_opposite	: std_logic_vector(number_of_sets-1 downto 0);
+	signal cache_ctrl_write_opposite	: std_logic_vector(number_of_sets-1 downto 0);
+	signal dirty_in_opposite			: std_logic_vector(number_of_sets-1 downto 0);
+	signal valid_in_opposite			: std_logic_vector(number_of_sets-1 downto 0);
+	signal dirty_out_opposite			: std_logic_vector(number_of_sets-1 downto 0);
+	signal valid_out_opposite			: std_logic_vector(number_of_sets-1 downto 0);
+	signal cache_addr_opposite			: cache_addr_t;
+	signal cache_ctrl_in_opposite		: cache_ctrl_t;
+	signal cache_ctrl_out_opposite	: cache_ctrl_t;
+	signal cache_word_out_opposite	: cache_word_t;
+	signal cache_word_in_opposite		: cache_word_t;
+	signal tag_in_opposite				: cache_tag_t;
+	signal tag_out_opposite				: cache_tag_t;
+	signal LRU_in_opposite				: LRU_t;
+	signal LRU_out_opposite				: LRU_t;
+	signal CCU_in_opposite				: CCU_t;
+	signal CCU_out_opposite				: CCU_t;
+	signal cache_index_opposite		: cache_index_t;
+	signal cache_offset_opposite		: cache_offset_t;
 
 	signal m_tag							: std_logic_vector(t-1 downto 0);
 	signal m_index							: std_logic_vector(s-1 downto 0);
@@ -129,7 +147,7 @@ architecture direct_mapped of L1_cache is
 	signal word_rst						: std_logic;
 	signal LRU_update						: std_logic;
 	signal word_number					: unsigned(l-1 downto 0);
-	signal dword_number					: unsigned(l-1 downto 0);
+	signal word_number_reg				: unsigned(l-1 downto 0);
 	signal hit_index						: integer range 0 to number_of_sets-1;
 	signal hit_index_reg					: integer range 0 to number_of_sets-1;
 	signal empty_index					: integer range 0 to number_of_sets-1;
@@ -137,8 +155,11 @@ architecture direct_mapped of L1_cache is
 	signal KO_index						: integer range 0 to number_of_sets-1;
 	signal KO_index_reg					: integer range 0 to number_of_sets-1;
 	signal hit_write						: std_logic_vector(number_of_sets-1 downto 0);
-	signal empty_write					: std_logic_vector(number_of_sets-1 downto 0);
-	signal KO_write						: std_logic_vector(number_of_sets-1 downto 0);
+	signal word_write_empty				: std_logic_vector(number_of_sets-1 downto 0);
+	signal word_write_KO					: std_logic_vector(number_of_sets-1 downto 0);
+	signal ctrl_write_empty				: std_logic_vector(number_of_sets-1 downto 0);
+	signal ctrl_write_KO					: std_logic_vector(number_of_sets-1 downto 0);
+
 	
 begin
 
@@ -189,7 +210,7 @@ begin
 		begin
 			if(rst = '1') then
 				word_number <= (others => '0');
-				dword_number <= (others => '0');
+				word_number_reg <= (others => '0');
 			elsif(rising_edge(clk)) then
 				if(word_rst = '1') then
 					word_number <= (others => '0');
@@ -198,7 +219,7 @@ begin
 				end if;
 				
 				-- double register the word number
-				dword_number <= word_number;
+				word_number_reg <= word_number;
 			end if;
 		
 		end process word_counter;
@@ -300,7 +321,7 @@ begin
 						end if;
 					
 					when mem_read => 
-						if((s_waitrequest_reg = '0') and (dword_number = words_per_line-1)) then
+						if((s_waitrequest_reg = '0') and (word_number_reg = words_per_line-1)) then
 							mem_current <= busy;
 						else
 							mem_current <= mem_read;
@@ -337,7 +358,7 @@ begin
 		
 	cache_gen:
 	for i in 0 to number_of_sets-1 generate
-		xcache : cache_set port map(clk, cache_addr_matched(i), cache_ctrl_write_matched(i), cache_word_write_matched(i), cache_ctrl_in_matched(i), cache_word_in_matched(i), cache_ctrl_out_matched(i), cache_word_out_matched(i), cache_addr_opposite, cache_ctrl_write_opposite, cache_word_write_opposite, cache_ctrl_in_opposite, cache_word_in_opposite, cache_ctrl_out_opposite, cache_word_out_opposite);
+		xcache : cache_set port map(clk, cache_addr_matched(i), cache_ctrl_write_matched(i), cache_word_write_matched(i), cache_ctrl_in_matched(i), cache_word_in_matched(i), cache_ctrl_out_matched(i), cache_word_out_matched(i), cache_addr_opposite(i), cache_ctrl_write_opposite(i), cache_word_write_opposite(i), cache_ctrl_in_opposite(i), cache_word_in_opposite(i), cache_ctrl_out_opposite(i), cache_word_out_opposite(i));
 	end generate cache_gen;
 	
 	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
@@ -451,15 +472,27 @@ begin
 			end if;
 			
 			if(i = empty_index_reg) then
-				empty_write(i) <= not s_waitrequest_reg;
+				word_write_empty(i) <= not s_waitrequest_reg;
+				if(word_number_reg = 0) then
+					ctrl_write_empty(i) <= not s_waitrequest_reg;
+				else
+					ctrl_write_empty(i) <= '0';
+				end if;
 			else
-				empty_write(i) <= '0';
+				word_write_empty(i) <= '0';
+				ctrl_write_empty(i) <= '0';
 			end if;
 			
 			if(i = KO_index_reg) then
-				KO_write(i) <= not s_waitrequest;
+				word_write_KO(i) <= not s_waitrequest;
+				if(word_number_reg = 0) then
+					ctrl_write_KO(i) <= not s_waitrequest_reg;
+				else
+					ctrl_write_KO(i) <= '0';
+				end if;
 			else
-				KO_write(i) <= '0';
+				word_write_KO(i) <= '0';
+				ctrl_write_KO(i) <= '0';
 			end if;
 		
 		end loop;
@@ -469,7 +502,7 @@ begin
 	empty_slot <= '0' when unsigned(empty_slots) = 0 else '1';
 		
 	output_assignments:
-		process(mem_current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, cache_word_out_matched, hit_index_reg, m_memwrite_matched, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out_matched, valid_out_matched, tag_out_matched, word_number, m_address_matched, m_writedata_matched, empty_slot, m_tag, dword_number, empty_write, s_waitrequest, s_waitrequest_reg, KO_write, KO_index_reg, m_memread_matched, hit_reg, hit_write)
+		process(mem_current, init_index, init_offset, m_index, m_offset, dma_req_reg, s_readdata, hit, cache_word_out_matched, hit_index_reg, m_memwrite_matched, LRU_update_dirty_in, LRU_update_valid_in, LRU_update_tag_in, LRU_update_word_in, dirty_out_matched, valid_out_matched, tag_out_matched, word_number, m_address_matched, m_writedata_matched, empty_slot, m_tag, word_number_reg, word_write_empty, ctrl_write_empty, s_waitrequest, s_waitrequest_reg, word_write_KO, ctrl_write_KO, KO_index_reg, m_memread_matched, hit_reg, hit_write)
 		begin
 			case mem_current is
 				
@@ -676,9 +709,9 @@ begin
 					tag_in_matched <= (others => m_tag);
 					cache_word_in_matched <= (others => s_readdata);
 					cache_index_matched <= (others => m_index);
-					cache_offset_matched <= (others => std_logic_vector(dword_number));
-					cache_word_write_matched <= empty_write;
-					cache_ctrl_write_matched <= empty_write;
+					cache_offset_matched <= (others => std_logic_vector(word_number_reg));
+					cache_word_write_matched <= word_write_empty;
+					cache_ctrl_write_matched <= ctrl_write_empty;
 					
 					--cache_write_2 <= ((not s_waitrequest_reg) and (hit_2 or (not dirty_out_2))) and (not lru_reg);
 					
@@ -691,7 +724,7 @@ begin
 					---------------------
 					----slave outputs----
 					---------------------
-					if((dword_number = (words_per_line-1)) and ((s_waitrequest = '0') or (s_waitrequest_reg = '0'))) then
+					if((word_number_reg = (words_per_line-1)) and ((s_waitrequest = '0') or (s_waitrequest_reg = '0'))) then
 						s_memread <= '0';
 					else
 						s_memread <= '1';
@@ -756,8 +789,8 @@ begin
 					cache_word_in_matched <= (others => (others => '0'));
 					cache_index_matched <= (others => m_index);
 					cache_offset_matched <= (others => std_logic_vector(word_number));				
-					cache_word_write_matched <= KO_write;
-					cache_ctrl_write_matched <= KO_write;
+					cache_word_write_matched <= word_write_KO;
+					cache_ctrl_write_matched <= ctrl_write_KO;
 					
 					----------------------
 					----master outputs----
