@@ -1,3 +1,22 @@
+--************************************************
+-- file		: cache.vhd
+-- author	: harsh aurora, loren lugosch
+-- date		: 25 jan 2015
+--
+-- brief	   : cache_tb skeleton
+--
+-- TODO		: one clock cycle delay after reads
+--				  try to get rid of it!
+--
+--				  Add matrix addition procs
+--
+--				  Add martix multiplication procs
+--
+--				  Reversing an array
+--
+--				  Sorting an array (bubble+merge)
+--************************************************
+
 use std.textio.all;
 library ieee;
 use ieee.std_logic_1164.all;
