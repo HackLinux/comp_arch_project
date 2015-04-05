@@ -15,8 +15,6 @@
 --				  Reversing an array
 --
 --				  Sorting an array (bubble+merge)
---
---				  run until a signal (modelsim autorun)
 --************************************************
 
 use std.textio.all;
@@ -81,6 +79,15 @@ architecture behaviour of cache_tb is
 	signal s_readdata		: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal s_waitrequest	: std_logic := '1';
 	
+	constant out_dir		: string := "./text/output/";
+	constant in_dir		: string := "./text/input/";
+	constant out_ext		: string := ".out";
+	constant in_ext		: string := ".in";
+	constant result_ext	: string := "_result";
+	
+	
+	
+	
 begin
 	 
     --dut => Device Under Test
@@ -102,7 +109,7 @@ begin
 		variable readdata			: integer := 0;
 		
 		variable out_line : line;
-		file out_file : text is out ("./text/output/single_core.out");
+		file out_file : text open write_mode is out_dir & "single_core" & out_ext;
 		
 		procedure reset is
 		begin
@@ -193,7 +200,7 @@ begin
 		
 		procedure store_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
 			variable l : line;
-			file f : text is in ("./text/input/" & array_file);
+			file f : text open read_mode is in_dir & array_file & in_ext;
 			variable a1 : integer;
 			variable space : character;
 			variable a2 : integer;
@@ -210,7 +217,7 @@ begin
 		
 		procedure assert_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
 			variable l : line;
-			file f : text is in ("./text/input/" & array_file);
+			file f : text open read_mode is in_dir & array_file & in_ext;
 			variable a1 : integer;
 			variable space : character;
 			variable a2 : integer;
@@ -226,7 +233,7 @@ begin
 				assert_data(a2);
 			end loop;
 		end assert_arrays;
-		
+
 		procedure add_arrays(array_length : in integer ; start_addr : in integer) is
 			variable a1 : integer;
 			variable a2 : integer;
@@ -240,9 +247,9 @@ begin
 			end loop;
 		end add_arrays;
 		
-		procedure verify_sum(sum_file : in string ; array_length : in integer ; start_addr : in integer) is
+		procedure verify_sum(array_file : in string ; array_length : in integer ; start_addr : in integer) is
 			variable l : line;
-			file f : text is in ("./text/input/" & sum_file);
+			file f : text open read_mode is in_dir & array_file & result_ext & in_ext;
 			variable r : integer;
 		begin
 			for i in 0 to array_length-1 loop
@@ -264,7 +271,7 @@ begin
 		write_time("Basic tests");
 		
 		start := now;
-		store_arrays("array10.in",10,100);
+		store_arrays("array1000",1000,100);
 		finish := now;
 		
 		write_time("Storing arrays");
@@ -276,21 +283,17 @@ begin
 		--write_time("Verifying arrays");
 		
 		start := now;
-		add_arrays(10,100);
+		add_arrays(1000,100);
 		finish := now;
 		
 		write_time("Adding arrays");
 		
 		start := now;
-		verify_sum("array10_result.in",10,100);
+		verify_sum("array1000",1000,100);
 		finish := now;
 		
 		write_time("Verifying sum");
 
-		
-		wait;
-
     end process;
-
  
 end;
