@@ -369,7 +369,7 @@ begin
 	m_index <= m_address_matched(s+l-1 downto l);
 	m_offset <= m_address_matched(l-1 downto 0);	
 	
-	process(CCU_in_matched, cache_index_matched, cache_offset_matched, dirty_in_matched, valid_in_matched, LRU_in_matched, tag_in_matched, cache_ctrl_out_matched, m_tag, tag_out_matched, valid_out_matched, dirty_out_matched, LRU_update, LRU_out_matched, hit_index, init_done, mem_current, hits, m_writedata_matched, hit_index_reg, cache_word_out_matched, empty_slots, empty_index_reg, KO_index, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot)
+	process(CCU_in_matched, cache_index_matched, cache_offset_matched, dirty_in_matched, valid_in_matched, LRU_in_matched, tag_in_matched, cache_ctrl_out_matched, m_tag, tag_out_matched, valid_out_matched, dirty_out_matched, LRU_update, LRU_out_matched, hit_index, init_done, mem_current, hits, m_writedata_matched, hit_index_reg, cache_word_out_matched, empty_slots, empty_index_reg, KO_index, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot, word_number_reg)
 	begin
 		for i in 0 to number_of_sets-1 loop
 			

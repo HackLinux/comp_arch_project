@@ -346,7 +346,7 @@ begin
 	m_index <= m_address(s+l-1 downto l);
 	m_offset <= m_address(l-1 downto 0);	
 	
-	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot)
+	process(CCU_in, cache_index, cache_offset, dirty_in, valid_in, LRU_in, tag_in, ctrl_out, m_tag, tag_out, valid_out, dirty_out, LRU_update, LRU_out, hit_index, init_done, current, hits, m_writedata, hit_index_reg, word_out, empty_slots, empty_index_reg, KO_index, KO_index_reg, s_waitrequest_reg, s_waitrequest, init_en, hit, empty_slot, word_number_reg)
 	begin
 		for i in 0 to number_of_sets-1 loop
 			
