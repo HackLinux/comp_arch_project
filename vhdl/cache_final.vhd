@@ -38,6 +38,14 @@ entity cache_final is
 end cache_final;
 
 architecture a0 of cache_final is
+  
+  component LSO_index is
+	port(	
+		vector : in std_logic_vector(number_of_sets-1 downto 0);
+		index_reg : in integer range 0 to number_of_sets-1;
+		index : out integer range 0 to number_of_sets-1
+	);
+  end component LSO_index;
 	
 	component cache_set is
 	port	(	clk					: in  std_logic;
@@ -338,6 +346,9 @@ begin
 		xcache : cache_set port map(clk, cache_addr(i), cache_ctrl_write(i), cache_word_write(i), ctrl_in(i), word_in(i), ctrl_out(i), word_out(i), zero_addr, '0', '0', zero_ctrl, zero_word, unused_ctrl(i), unused_word(i));
 	end generate cache_gen;
 	
+	xLSO_index_1 : LSO_index port map(hits, hit_index_reg, hit_index);
+	xLSO_index_2 : LSO_index port map(empty_slots, empty_index_reg, empty_index);
+	
 	init_done <= '1' when ((init_index = lines_per_set-1) and (init_offset = words_per_line-1)) else '0';
 	
 	dma_req <= m_address(r-1);
@@ -411,29 +422,11 @@ begin
 					LRU_update_word_in(i) <= word_out(i);
 				end if;
 				
-				if(hit = '1') then
-					if(hits(i) = '1') then
-						hit_index <= i;
-					end if;
-				else
-					hit_index <= hit_index_reg;
-				end if;
-				
-				if(unsigned(empty_slots) /= 0) then
-					if(empty_slots(i) = '1') then
-						empty_index <= i;
-					end if;
-				else					
-					empty_index <= empty_index_reg;
-				end if;
-				
 				if(unsigned(LRU_out(i)) = number_of_sets-1) then
 					KO_index <= i;
 				end if;
 				
 			else
-				hit_index <= hit_index_reg;
-				empty_index <= empty_index_reg;
 				KO_index <= KO_index_reg;
 				
 				LRU_update_dirty_in(i) <= dirty_out(i);
