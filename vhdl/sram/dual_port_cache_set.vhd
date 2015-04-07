@@ -1,15 +1,15 @@
 --************************************************
--- file		: cache_set.vhd
--- author	: harsh aurora
--- date		: 23 jan 2015
+-- file		:	dual_port_cache_set.vhd
+-- author	:	harsh aurora, loren lugosch
+-- date		:	7 april 2015
 --
--- brief	   : this file describes the structure 
---            of a single cache set, including
---            both the block data and the control 
---            data (i.e. dirty, valid, tag).
+-- brief	   :	this file describes the structure 
+--					of a dual port cache set
+-- 
+--					contains both control and word data
 --
---            The set is synthesized into SRAM
---            blocks ()
+--					the set is synthesized into SRAM
+--					blocks
 --************************************************
 
 library ieee;
@@ -17,7 +17,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.params.all;
 
-entity cache_set is
+entity dual_port_cache_set is
 	port	(	clk					: in  std_logic;
 				addr_0				: in  std_logic_vector(s+l-1 downto 0);
 				ctrl_write_0		: in  std_logic;
@@ -34,9 +34,9 @@ entity cache_set is
 				ctrl_out_1			: out std_logic_vector(ctrl_length-1 downto 0);
 				word_out_1			: out std_logic_vector(word_length-1 downto 0)
 			);
-end cache_set;
+end dual_port_cache_set;
 
-architecture modelsim of cache_set is 
+architecture modelsim of dual_port_cache_set is 
 
 	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 
@@ -116,7 +116,7 @@ begin
 		
 end modelsim;
 
---architecture quartus of cache_set is 
+--architecture quartus of dual_port_cache_set is 
 --
 --	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 --

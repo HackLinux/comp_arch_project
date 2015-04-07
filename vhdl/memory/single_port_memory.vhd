@@ -1,20 +1,17 @@
 --************************************************
--- file			: memory.vhd
--- source		: ECSE 487 course website
--- modified by : harsh aurora
--- date			: 26 jan 2015
+-- file			:	single_port_memory.vhd
+-- author		:	harsh aurora, loren lugosch
+-- date			:	7 april 2015
 --
--- brief	   	: Adapted from Example 12-15 of  
---            	  Quartus Design and Synthesis
---               handbook
+-- brief	   	:	single port main memory
+--						avalon interface
 --************************************************
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.params.all;
 
-
-entity memory is
+entity single_port_memory is
 	port	(	clk				: in  std_logic;
 				rst				: in  std_logic;
 				s_writedata		: in  std_logic_vector (word_length-1 downto 0);
@@ -24,18 +21,18 @@ entity memory is
 				s_readdata		: out std_logic_vector (word_length-1 downto 0);
 				s_waitrequest	: out std_logic
 			);
-end memory;
+end single_port_memory;
 
-architecture rtl of memory is
+architecture a0 of single_port_memory is
 
-	component ram is
+	component single_port_ram is
 	port	(	clk				: in  std_logic;
 				write_en			: in	std_logic;
 				address			: in  std_logic_vector(r-1 downto 0);
 				data_in			: in	std_logic_vector(word_length-1 downto 0);
 				data_out			: out std_logic_vector(word_length-1 downto 0)
 			);
-	end component ram;
+	end component single_port_ram;
 
 	type state is (reset, idle, busy);
 	
@@ -134,6 +131,6 @@ begin
 		
 		end process output_assignments;
 	
-	xram:	ram port map(clk, memwrite, address, writedata, s_readdata);
+	xsingle_port_ram:	single_port_ram port map(clk, memwrite, address, writedata, s_readdata);
 	
-end rtl;
+end a0;

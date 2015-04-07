@@ -1,15 +1,13 @@
 --************************************************
--- file		: ram.vhd
--- author	: harsh aurora
--- date		: 23 jan 2015
+-- file		:	single_port_ram.vhd
+-- author	:	harsh aurora, loren lugosch
+-- date		:	7 april 2015
 --
--- brief	   : this file describes the structure 
---            of a single cache set, including
---            both the block data and the control 
---            data (i.e. dirty, valid, tag).
+-- brief	   :	this file describes the structure 
+--					of single port memory
 --
---            The set is synthesized into SRAM
---            blocks ()
+--					the memory is synthesized into SRAM
+--					blocks
 --************************************************
 
 library ieee;
@@ -17,16 +15,16 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.params.all;
 
-entity ram is
+entity single_port_ram is
 	port	(	clk				: in  std_logic;
 				write_en			: in	std_logic;
 				address			: in  std_logic_vector(r-1 downto 0);
 				data_in			: in	std_logic_vector(word_length-1 downto 0);
 				data_out			: out std_logic_vector(word_length-1 downto 0)
 			);
-end ram;
+end single_port_ram;
 
-architecture a of ram is
+architecture a0 of single_port_ram is
 		
 	type mem_data is array (ram_size-1 downto 0) of std_logic_vector(word_length-1 downto 0);
 
@@ -55,4 +53,4 @@ begin
 	
 	data_out <= memory(addr_reg);
 		
-end a;
+end a0;

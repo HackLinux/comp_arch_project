@@ -3,7 +3,6 @@
 
 library ieee;
 use std.textio.all;
-use ieee.std_logic_misc.all;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_textio.all;
 use ieee.numeric_std.all;
@@ -25,14 +24,11 @@ end component LSO_index;
 signal test_vector : std_logic_vector(number_of_sets-1 downto 0);
 signal index_reg : integer range 0 to number_of_sets-1;
 signal index : integer range 0 to number_of_sets-1;
-signal tttt : std_logic;
 
 begin
 
 	dut : LSO_index port map(test_vector,index_reg,index);
 	 
-	tttt <= and_reduce("111");
-	
 	test_process : process
 	
 	variable out_line : line;

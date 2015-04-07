@@ -23,6 +23,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_textio.all;
 use ieee.numeric_std.all;
 use work.params.all;
+use work.cache_types.all;
+
 
 entity single_port_cache_tb is
 end single_port_cache_tb;
@@ -31,7 +33,7 @@ architecture a0 of single_port_cache_tb is
 
 --Declare the component that you are testing:
 
-	component memory is
+	component single_port_memory is
 		port	(	clk				: in  std_logic;
 					rst				: in  std_logic;
 					s_writedata		: in  std_logic_vector (word_length-1 downto 0);
@@ -41,7 +43,7 @@ architecture a0 of single_port_cache_tb is
 					s_readdata		: out std_logic_vector (word_length-1 downto 0);
 					s_waitrequest	: out std_logic
 				);
-	end component;
+	end component single_port_memory;
 	
 	component single_port_cache is
 		port	(	clk				: in  std_logic;
@@ -67,12 +69,13 @@ architecture a0 of single_port_cache_tb is
 					s_waitrequest	: in  std_logic
 				);
 
-	end component single_port_cache
+	end component single_port_cache;
 
     --all the input signals with initial values
 	signal clk				: std_logic := '0';
 	signal rst				: std_logic := '1';
 	signal flush			: std_logic	:= '0';
+	signal stall			: std_logic := '0';
 	signal ready			: std_logic := '0';
 	signal m_writedata	: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal m_address		: std_logic_vector(r-1 downto 0) := (others => '0');
@@ -99,12 +102,12 @@ architecture a0 of single_port_cache_tb is
 begin
 	 
     --dut => Device Under Test
-	 xmemory :	memory port map(	clk, rst, 
-											s_writedata, s_address, s_memwrite, s_memread, s_readdata, s_waitrequest);
+	 xsingle_port_memory :	single_port_memory port map(	clk, rst, 
+																			s_writedata, s_address, s_memwrite, s_memread, s_readdata, s_waitrequest);
 											
-    xsingle_port_cache :	single_port_cache port map(clk, rst, flush, ready,
-																		m_writedata, m_address, m_memwrite, m_memread, m_readdata, m_waitrequest,
-																		s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
+    xsingle_port_cache :	single_port_cache port map(	clk, rst, flush, stall, ready,
+																			m_writedata, m_address, m_memwrite, m_memread, m_readdata, m_waitrequest,
+																			s_writedata,s_address,s_memwrite,s_memread,s_readdata,s_waitrequest);
     
 	 clk_process : process
     begin
@@ -301,17 +304,17 @@ begin
 		
 		reset;
 		
-		--start := now;
-		--basic_tests;
-		--finish := now;
+		start := now;
+		basic_tests;
+		finish := now;
 		
-		--write_time("Basic tests");
+		write_time("Basic tests");
 		
-		--start := now;
-		--store_arrays("array1000",1000,100);
-		--finish := now;
+		start := now;
+		store_arrays("array1000",1000,100);
+		finish := now;
 		
-		--write_time("Storing arrays");
+		write_time("Storing arrays");
 		
 		--start := now;
 		--assert_arrays("array10.in",10,100);
@@ -319,23 +322,23 @@ begin
 		
 		--write_time("Verifying arrays");
 		
-		--start := now;
-		--add_arrays(1000,100);
-		--finish := now;
-		
-		--write_time("Adding arrays");
-		
-		--start := now;
-		--verify_sum("array1000",1000,100);
-		--finish := now;
-		
-		--write_time("Verifying sum");
-		
 		start := now;
-		flush_test;
+		add_arrays(1000,100);
 		finish := now;
 		
-		write_time("Flush test");
+		write_time("Adding arrays");
+		
+		start := now;
+		verify_sum("array1000",1000,100);
+		finish := now;
+		
+		write_time("Verifying sum");
+		
+		--start := now;
+		--flush_test;
+		--finish := now;
+		
+		--write_time("Flush test");
 		
 		wait;
     end process;
