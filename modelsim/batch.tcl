@@ -1,25 +1,9 @@
 proc c  {} {
     # compile all VHDs in proper order
     echo "---------------STARTED COMPILING---------------------------"
-    vcom ../vhdl/params.vhd
-    vcom ../vhdl/ram.vhd
-    vcom ../vhdl/memory.vhd
-    vcom ../vhdl/testbench/memory_tb.vhd 
     
-    vcom ../vhdl/cache_set.vhd 
-    vcom ../vhdl/testbench/cache_set_tb.vhd
-    
-    vcom ../vhdl/cache_final.vhd
-    vcom ../vhdl/testbench/cache_tb.vhd 
-    
-    vcom ../vhdl/L1_cache.vhd
-    vcom ../vhdl/L2_cache.vhd
-    # vcom ../vhdl/testbench/L1_cache_tb.vhd
-    # vcom ../vhdl/testbench/L2_cache_tb.vhd   
-    
-    vcom ../vhdl/mux.vhd
-    vcom ../vhdl/LSO_index.vhd
-    vcom ../vhdl/testbench/LSO_index_tb.vhd
+    vcom ../vhdl/*.vhd
+    vcom ../vhdl/testbench/*.vhd
     
     echo "---------------FINISHED COMPILING--------------------------"
 }
@@ -29,8 +13,8 @@ proc r  {tb} {
     echo "---------------STARTED RUNNING---------------------------"
     echo $tb
     vsim work.$tb
-    add wave *
-    #do wave/$tb.do
+    #add wave *
+    do wave/$tb.do
     restart
     
     # add a breakpoint to the line which contains
@@ -38,15 +22,6 @@ proc r  {tb} {
     set path "../vhdl/testbench/"
     set ext ".vhd"
     set filename $path$tb$ext
-    echo ""
-    echo ""
-    echo ""
-    echo ""
-    echo $filename
-    echo ""
-    echo ""
-    echo ""
-    echo ""
     set fp [open $filename r]
     set filecontent [read $fp]
     set input_list [split $filecontent "\n"]
@@ -70,4 +45,4 @@ proc Q  {} {
 
 #comment?
 c
-r "LSO_index_tb"
+r "split_cache_tb"
