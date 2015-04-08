@@ -31,43 +31,31 @@ architecture a0 of split_cache_tb is
 
 --Declare the component that you are testing:
 
-	component memory is
-		port	(	clk				: in  std_logic;
-					rst				: in  std_logic;
-					s_writedata		: in  std_logic_vector (word_length-1 downto 0);
-					s_address		: in  std_logic_vector(r-1 downto 0);
-					s_memwrite		: in  std_logic;
-					s_memread		: in  std_logic;
-					s_readdata		: out std_logic_vector (word_length-1 downto 0);
-					s_waitrequest	: out std_logic
-				);
-	end component;
-	
-	component single_port_cache is
-		port	(	clk				: in  std_logic;
-					rst				: in 	std_logic;
-					flush				: in  std_logic;
-					stall				: in 	std_logic;
-					ready				: out std_logic;
+	component horens_two_proc_system is
+		port	(	clk		: in  std_logic;
+					rst		: in  std_logic;
 					
-					-- I/O interface for the FSM/Processor
-					m_writedata		: in  std_logic_vector (word_length-1 downto 0);
-					m_address		: in  std_logic_vector(r-1 downto 0);
-					m_memwrite		: in  std_logic;
-					m_memread		: in  std_logic;
-					m_readdata		: out std_logic_vector (word_length-1 downto 0);
-					m_waitrequest	: out std_logic;
+					flush_0				: in  std_logic;
+					ready_0				: out std_logic;
 					
-					-- I/O interface for memory
-					s_writedata		: out std_logic_vector (word_length-1 downto 0);
-					s_address		: out std_logic_vector(r-1 downto 0);
-					s_memwrite		: out std_logic;
-					s_memread		: out std_logic;
-					s_readdata		: in  std_logic_vector (word_length-1 downto 0);
-					s_waitrequest	: in  std_logic
+					m_writedata_0		: in  std_logic_vector (word_length-1 downto 0);
+					m_address_0			: in  std_logic_vector(r-1 downto 0);
+					m_memwrite_0		: in  std_logic;
+					m_memread_0			: in  std_logic;
+					m_readdata_0		: out std_logic_vector (word_length-1 downto 0);
+					m_waitrequest_0	: out std_logic;
+					
+					flush_1				: in  std_logic;
+					ready_1				: out std_logic;
+					
+					m_writedata_1		: in  std_logic_vector (word_length-1 downto 0);
+					m_address_1			: in  std_logic_vector(r-1 downto 0);
+					m_memwrite_1		: in  std_logic;
+					m_memread_1			: in  std_logic;
+					m_readdata_1		: out std_logic_vector (word_length-1 downto 0);
+					m_waitrequest_1	: out std_logic			
 				);
-
-	end component single_port_cache;
+	end component horens_two_proc_system;
 
     --all the input signals with initial values
 	signal clk				: std_logic := '0';
@@ -83,12 +71,6 @@ architecture a0 of split_cache_tb is
 	signal m_memread_0		: std_logic := '0';
 	signal m_readdata_0		: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal m_waitrequest_0	: std_logic := '1';
-	signal s_writedata_0	: std_logic_vector (word_length-1 downto 0) := (others => '0');
-	signal s_address_0		: std_logic_vector(r-1 downto 0) := (others => '0');
-	signal s_memwrite_0		: std_logic := '0';
-	signal s_memread_0		: std_logic := '0';
-	signal s_readdata_0		: std_logic_vector (word_length-1 downto 0) := (others => '0');
-	signal s_waitrequest_0	: std_logic := '1';
 	
 	signal m_writedata_1	: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal m_address_1		: std_logic_vector(r-1 downto 0) := (others => '0');
@@ -96,12 +78,6 @@ architecture a0 of split_cache_tb is
 	signal m_memread_1		: std_logic := '0';
 	signal m_readdata_1		: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal m_waitrequest_1	: std_logic := '1';
-	signal s_writedata_1	: std_logic_vector (word_length-1 downto 0) := (others => '0');
-	signal s_address_1		: std_logic_vector(r-1 downto 0) := (others => '0');
-	signal s_memwrite_1		: std_logic := '0';
-	signal s_memread_1		: std_logic := '0';
-	signal s_readdata_1		: std_logic_vector (word_length-1 downto 0) := (others => '0');
-	signal s_waitrequest_1	: std_logic := '1';
 	
 	constant out_dir		: string := "./text/output/";
 	constant in_dir		: string := "./text/input/";
@@ -129,20 +105,15 @@ architecture a0 of split_cache_tb is
 	signal writedata_1  : integer := 0; 
 	
 begin
-	 
-    --dut => Device Under Test
-	 xmemory :	memory port map(	clk, rst, 
-											s_writedata_0, s_address_0, s_memwrite_0, s_memread_0, s_readdata_0, s_waitrequest_0);
-											
-   p0_L1_cache :	single_port_cache port map(clk, rst, flush_0, ready_0, stall_0,
-																		m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
-																		s_writedata_0,s_address_0,s_memwrite_0,s_memread_0,s_readdata_0,s_waitrequest_0);
-																		
-	 p1_L1_cache :	single_port_cache port map(clk, rst, flush_1, ready_1, stall_1,
-																		m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1,
-																		s_writedata_1,s_address_1,s_memwrite_1,s_memread_1,s_readdata_1,s_waitrequest_1);
-    
-	 clk_process : process
+	
+	xhtps : horens_two_proc_system port map(	clk, rst,
+															flush_0, ready_0,
+															m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
+															flush_1, ready_1,
+															m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1);
+	
+	clk_process : process
+
    begin
        clk <= '0';
        wait for clock_period/2;
@@ -159,7 +130,6 @@ begin
 			m_memwrite_0 <= '0';
 			m_memread_0 <= '1';
 			
-			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
 			m_memread_0 <= '0';
 			m_address_0 <= (others => '0');
@@ -179,7 +149,6 @@ begin
 			m_memwrite_1 <= '0';
 			m_memread_1 <= '1';
 			
-			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
 			m_memread_1 <= '0';
 			m_address_1 <= (others => '0');
@@ -199,7 +168,6 @@ begin
 			m_memwrite_0 <= '1';
 			m_memread_0 <= '0';
 		
-			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
 			m_memwrite_0 <= '0';
 			m_writedata_0 <= (others => '0');
@@ -217,7 +185,6 @@ begin
 			m_memwrite_1 <= '1';
 			m_memread_1 <= '0';
 		
-			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
 			m_memwrite_1 <= '0';
 			m_writedata_1 <= (others => '0');
