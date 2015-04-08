@@ -184,7 +184,7 @@ begin
 			when idle =>
 				c_stall <= '1';
 				
-				if((hit_remote and (not c_hit_in)) = '1') then
+				if(((m_memread_local xor m_memwrite_local) and (hit_remote and (not c_hit_in))) = '1') then
 					c_blast <= '1';
 				else	
 					c_blast <= '0';

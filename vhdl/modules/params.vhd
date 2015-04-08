@@ -53,10 +53,10 @@ package body params is
 	constant w : integer := 2 ;	-- 4 bytes per word		-- DEPENDENCIES : w = c-l-a-s
 	constant l : integer := 2 ;	-- 4 words per line		-- DEPENDENCIES : l = c-w-a-s
 	constant a : integer := 3 ;	-- 8-way associative		-- DEPENDENCIES : a = c-w-l-s
-	constant s : integer := 5 ;	-- 32 sets 					-- DEPENDENCIES : s = c-w-l-a
-	constant c : integer := 12;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
-	constant t : integer := 12; 	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
-	constant r : integer := 19;	-- 4 MB SRAM				-- DEPENDENCIES : the size of memory is a design decision
+	constant s : integer := 3 ;	-- 32 sets 					-- DEPENDENCIES : s = c-w-l-a
+	constant c : integer := 8 ;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
+	constant t : integer := 8 ; 	-- 12 tag bits				-- DEPENDENCIES : t = r-s-l
+	constant r : integer := 13;	-- 4 MB SRAM				-- DEPENDENCIES : the size of memory is a design decision
 	
 	constant mem_b : integer := 2; -- dirty, valid
 	constant ccu_b : integer := 2; -- MSI/MESI enumerations 

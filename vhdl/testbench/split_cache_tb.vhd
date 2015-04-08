@@ -99,10 +99,13 @@ architecture a0 of split_cache_tb is
 	signal stall_0 : std_logic := '0';
 	signal stall_1 : std_logic := '0';
 	
-	signal readdata_0			: integer := 0;
-	signal readdata_1			: integer := 0;
+	--signal readdata_0			: integer := 0;
+	--signal readdata_1			: integer := 0;
 	signal writedata_0  : integer := 0;
 	signal writedata_1  : integer := 0; 
+	
+	signal sync_0				: std_logic := '0';
+	signal sync_1				: std_logic := '0';
 	
 begin
 	
@@ -121,337 +124,478 @@ begin
        wait for clock_period/2;
    end process;
 	 
-	read_addr_P0: process
+--	read_addr_P0: process
+--	begin
+--		if (activate_P0_read = '1') then
+--			P0_done <= '0';
+--			m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
+--			m_writedata_0 <= (others => '0');
+--			m_memwrite_0 <= '0';
+--			m_memread_0 <= '1';
+--			
+--			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
+--			m_memread_0 <= '0';
+--			m_address_0 <= (others => '0');
+--				
+--			wait until rising_edge(clk);
+--			readdata_0 <= to_integer(unsigned(m_readdata_0));
+--			P0_done <= '1';
+--		end if;
+--	end process;
+--		
+--	read_addr_P1: process
+--	begin
+--		if (activate_P1_read = '1') then
+--			P1_done <= '0';
+--			m_address_0 <= std_logic_vector(to_unsigned(addr_1, r));
+--			m_writedata_1 <= (others => '0');
+--			m_memwrite_1 <= '0';
+--			m_memread_1 <= '1';
+--			
+--			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
+--			m_memread_1 <= '0';
+--			m_address_1 <= (others => '0');
+--				
+--			wait until rising_edge(clk);
+--			readdata_1 <= to_integer(unsigned(m_readdata_1));
+--			P1_done <= '1';
+--		end if;
+--	end process;
+--
+--	write_addr_P0: process
+--	begin
+--		if (activate_P0_write = '1') then
+--			P0_done <= '0';
+--			m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
+--			m_writedata_0 <= std_logic_vector(to_unsigned(writedata_0, word_length));
+--			m_memwrite_0 <= '1';
+--			m_memread_0 <= '0';
+--		
+--			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
+--			m_memwrite_0 <= '0';
+--			m_writedata_0 <= (others => '0');
+--			m_address_0 <= (others => '0');
+--			P0_done <= '1';
+--		end if;
+--	end process;
+--		
+--	write_addr_P1: process
+--	begin
+--		if (activate_P1_write = '1') then
+--			P1_done <= '0';
+--			m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
+--			m_writedata_1 <= std_logic_vector(to_unsigned(writedata_1, word_length));
+--			m_memwrite_1 <= '1';
+--			m_memread_1 <= '0';
+--		
+--			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
+--			m_memwrite_1 <= '0';
+--			m_writedata_1 <= (others => '0');
+--			m_address_1 <= (others => '0');
+--			P1_done <= '1';
+--		end if;
+--	end process;
+	
+--    test_process : process
+--	 
+--		variable start				: time := 0 ns;
+--		variable finish			: time := 0 ns;
+--		
+--		variable out_line : line;
+--		file out_file : text open write_mode is out_dir & "single_core" & out_ext;
+--		
+--		procedure reset is
+--		begin
+--		
+--			rst <= '1';
+--		
+--			m_address_0 <= (others => '0');
+--			m_writedata_0 <= (others => '0');
+--			m_memwrite_0 <= '0';
+--			m_memread_0 <= '0';
+--			
+--			m_address_1 <= (others => '0');
+--			m_writedata_1 <= (others => '0');
+--			m_memwrite_1 <= '0';
+--			m_memread_1 <= '0';
+--			
+--			wait for 3*clock_period;
+--			wait until rising_edge(clk);
+--			rst <= '0';
+--		
+--		end reset;
+--		
+--		procedure read_addr(addr : in integer; proc : in std_logic) is
+--		begin
+--			if (proc = P0) then
+--				addr_0 <= addr;
+--				m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
+--				activate_P0_read <= '1';
+--				wait until P0_done = '1';
+--				activate_P0_read <= '0';
+--			end if;
+--			
+--			if (proc = P1) then
+--				addr_1 <= addr;
+--				m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
+--				activate_P1_read <= '1';
+--				wait until P1_done = '1';
+--				activate_P1_read <= '0';
+--			end if;
+--		end read_addr;
+--		
+--		procedure write_addr(addr : in integer; writedata : in integer; proc : in std_logic) is
+--		begin
+--			if (proc = P0) then
+--				addr_0 <= addr;
+--				writedata_0 <= writedata; 
+--				m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
+--				activate_P0_write <= '1';
+--				wait until P0_done = '1';
+--				activate_P0_write <= '0';
+--			end if;
+--			
+--			if (proc = P1) then
+--				addr_1 <= addr;
+--				writedata_1 <= writedata; 
+--				m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
+--				activate_P1_write <= '1';
+--				wait until P1_done = '1';
+--				activate_P1_write <= '0';
+--			end if;
+--			
+--		end write_addr;
+		
+--		procedure assert_data(correct_data : in integer; test_data : in integer) is
+--		begin
+--			assert test_data = correct_data report "Assert Failed" severity Failure;			
+--		end assert_data;
+--		
+--		procedure write_file(str : in string) is
+--		begin
+--			write(out_line, str);
+--			writeline(out_file, out_line);
+--		end write_file;
+--		
+--		procedure write_time(test : in string) is
+--		begin
+--			write(out_line, test & " took " & integer'image((finish-start)/clock_period) & " clock cycles");
+--			writeline(out_file, out_line);
+--		end write_time;
+--		
+--		procedure basic_tests is
+--		begin
+--			
+--			write_addr(9,9,P0);
+--			read_addr(9,P0);
+--			assert_data(9);
+--
+--			write_addr(10,10,P0);
+--			read_addr(10,P0);
+--			assert_data(10,P0);
+--
+--			for i in 0 to 4095  loop
+--				write_addr(i,i,P0);
+--			end loop;
+--			
+--			for i in 0 to 4095  loop
+--				read_addr(i,P0);
+--				assert_data(i);
+--			end loop;
+--			
+--		end basic_tests;
+--		
+--
+--		procedure flush_test is
+--		begin
+--			
+--			for i in 0 to (ram_size/2048)-1 loop
+--				for j in 0 to 1023  loop
+--					read_addr((i*1024)+j,P0);
+--				end loop;
+--			
+--				for j in 0 to 1023  loop
+--					write_addr((i*1024)+j,(i*1024)+j,P0);
+--				end loop;
+--			
+--				flush <= '1';
+--				wait until rising_edge(clk);
+--				flush <= '0';
+--			end loop;
+--			
+--			for i in 0 to (ram_size/2048)-1 loop
+--				for j in 0 to 1023  loop
+--					read_addr((i*1024)+j,P0);
+--					assert_data((i*1024)+j);
+--				end loop;	
+--			end loop;
+--			
+--		end flush_test;
+--		
+--		procedure store_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
+--			variable l : line;
+--			file f : text open read_mode is in_dir & array_file & in_ext;
+--			variable a1 : integer;
+--			variable space : character;
+--			variable a2 : integer;
+--		begin
+--			for i in 0 to array_length-1 loop
+--				readline(f, l);
+--				read(l, a1);
+--				read(l, space);
+--				read(l, a2);
+--				write_addr(start_addr+i,a1,P0);
+--				write_addr(start_addr+array_length+i,a2,P0);
+--			end loop;
+--		end store_arrays;
+--		
+--		procedure assert_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
+--			variable l : line;
+--			file f : text open read_mode is in_dir & array_file & in_ext;
+--			variable a1 : integer;
+--			variable space : character;
+--			variable a2 : integer;
+--		begin
+--			for i in 0 to array_length-1 loop
+--				readline(f, l);
+--				read(l, a1);
+--				read(l, space);
+--				read(l, a2);
+--				read_addr(start_addr+i,P0);
+--				assert_data(a1);
+--				read_addr(start_addr+array_length+i,P0);
+--				assert_data(a2);
+--			end loop;
+--		end assert_arrays;
+--
+--		
+--		procedure verify_sum(array_file : in string ; array_length : in integer ; start_addr : in integer) is
+--			variable l : line;
+--			file f : text open read_mode is in_dir & array_file & result_ext & in_ext;
+--			variable r : integer;
+--		begin
+--			for i in 0 to array_length-1 loop
+--				readline(f, l);
+--				read(l, r);
+--				read_addr(start_addr+array_length+array_length+i,P0);
+--				assert_data(r);
+--			end loop;
+--		end verify_sum;
+--		
+--		procedure add_arrays_interleaved(array_length : in integer ; start_addr_a : in integer; start_addr_b : in integer; start_addr_c : in integer) is
+--			variable a0 : integer;
+--			variable a1 : integer;
+--			variable b0 : integer;
+--			variable b1 : integer;
+--			variable c0 : integer;
+--			variable c1 : integer;
+--			variable i : integer range 0 to array_length;
+--			
+--		begin
+--			i := 0;
+--			-- interleaved access: CPU0 accesses block 0, CPU1 block 1, CPU0 block 2, etc.
+--			while (i < array_length) loop
+--				-- CPU0 and CPU1 access their blocks in parallel
+--			read_addr(start_addr_a+i,P0);
+--				a0 := readdata_0;
+--				read_addr(start_addr_b+i,P0);
+--				b0 := readdata_0;
+--				
+--				read_addr(start_addr_a+i,P1);
+--				a1 := readdata_1;
+--				read_addr(start_addr_b+i,P1);
+--				b1 := readdata_1;
+--				
+--				-- only start write procedure after both waitrequest0 and waitrequest1 go low
+--				write_addr(start_addr_c+i,(a0 + b0),P0);
+--				write_addr(start_addr_c+i,(a1 + b1),P1);
+--				
+--				i := i * words_per_line
+--			end loop;
+--		end add_arrays_interleaved;
+		
+--	 begin
+--		
+--		reset;
+--		
+--		read_addr(0,P0);
+--		write_addr(0,21,P0);
+--		write_addr(0,19,P1);
+--		read_addr(0,P1);
+--		assert readdata_0 = 19 report "Assert Failed" severity Failure;
+		
+--		start := now;
+--		basic_tests;
+--		finish := now;
+--		
+--		write_time("Basic tests");
+--		
+--		start := now;
+--		store_arrays("array1000",1000,100);
+--		finish := now;
+--		
+--		write_time("Storing arrays");
+--		
+--		start := now;
+--		assert_arrays("array10.in",10,100);
+--		finish := now;
+--		
+--		write_time("Verifying arrays");
+--		
+--		start := now;
+--		add_arrays(1000,100);
+--		finish := now;
+--		
+--		write_time("Adding arrays");
+--		
+--		start := now;
+--		verify_sum("array1000",1000,100);
+--		finish := now;
+--		
+--		write_time("Verifying sum");
+--		
+--		start := now;
+--		flush_test;
+--		finish := now;
+--		
+--		write_time("Flush test");
+--
+--		
+--		
+--		wait;
+--    end process;
+
+	
+	reset:
+	process
 	begin
-		if (activate_P0_read = '1') then
-			P0_done <= '0';
-			m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
+		rst <= '1';
+		wait for 3*clock_period;
+		wait until rising_edge(clk);
+		rst <= '0';
+		wait;
+	end process reset;
+
+	P_0:
+	process
+	
+		variable readdata_0 : integer := 0;
+	
+    	procedure read_addr(addr : in integer) is
+		begin
+			m_address_0 <= std_logic_vector(to_unsigned(addr, r));
 			m_writedata_0 <= (others => '0');
 			m_memwrite_0 <= '0';
 			m_memread_0 <= '1';
-			
+		
+			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
 			m_memread_0 <= '0';
 			m_address_0 <= (others => '0');
-				
-			wait until rising_edge(clk);
-			readdata_0 <= to_integer(unsigned(m_readdata_0));
-			P0_done <= '1';
-		end if;
-	end process;
-		
-	read_addr_P1: process
-	begin
-		if (activate_P1_read = '1') then
-			P1_done <= '0';
-			m_address_0 <= std_logic_vector(to_unsigned(addr_1, r));
-			m_writedata_1 <= (others => '0');
-			m_memwrite_1 <= '0';
-			m_memread_1 <= '1';
 			
-			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
-			m_memread_1 <= '0';
-			m_address_1 <= (others => '0');
-				
 			wait until rising_edge(clk);
-			readdata_1 <= to_integer(unsigned(m_readdata_1));
-			P1_done <= '1';
-		end if;
-	end process;
-
-	write_addr_P0: process
-	begin
-		if (activate_P0_write = '1') then
-			P0_done <= '0';
-			m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
-			m_writedata_0 <= std_logic_vector(to_unsigned(writedata_0, word_length));
+			readdata_0 := to_integer(unsigned(m_readdata_0));
+		end read_addr;
+		
+		procedure write_addr(addr : in integer; writedata : in integer) is
+		begin
+			m_address_0 <= std_logic_vector(to_unsigned(addr, r));
+			m_writedata_0 <= std_logic_vector(to_unsigned(writedata, word_length));
 			m_memwrite_0 <= '1';
 			m_memread_0 <= '0';
 		
+			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_0 = '0'));
 			m_memwrite_0 <= '0';
 			m_writedata_0 <= (others => '0');
 			m_address_0 <= (others => '0');
-			P0_done <= '1';
-		end if;
-	end process;
+			
+		end write_addr;
 		
-	write_addr_P1: process
+		procedure assert_data(correct_data : in integer) is
+		begin
+			assert readdata_0 = correct_data report "Assert Failed P0" severity Failure;			
+		end assert_data;
+
 	begin
-		if (activate_P1_write = '1') then
-			P1_done <= '0';
-			m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
-			m_writedata_1 <= std_logic_vector(to_unsigned(writedata_1, word_length));
+	
+		wait until rst = '0';
+			
+		sync_1 <= '0';
+		read_addr(0);
+		write_addr(0,21);
+		read_addr(0);
+		assert_data(21);
+		sync_1 <= '1';
+		
+		wait until sync_0 = '1';
+		sync_1 <= '1';
+		
+		read_addr(0);
+		assert_data(19);
+		
+		
+	
+	end process P_0;
+	
+	P_1:
+	process
+	
+		variable readdata_1 : integer := 0;
+	
+    	procedure read_addr(addr : in integer) is
+		begin
+			m_address_1 <= std_logic_vector(to_unsigned(addr, r));
+			m_writedata_1 <= (others => '0');
+			m_memwrite_1 <= '0';
+			m_memread_1 <= '1';
+		
+			--wait until rising_edge(m_waitrequest);
+			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
+			m_memread_1 <= '0';
+			m_address_1 <= (others => '0');
+			
+			wait until rising_edge(clk);
+			readdata_1 := to_integer(unsigned(m_readdata_1));
+		end read_addr;
+		
+		procedure write_addr(addr : in integer; writedata : in integer) is
+		begin
+			m_address_1 <= std_logic_vector(to_unsigned(addr, r));
+			m_writedata_1 <= std_logic_vector(to_unsigned(writedata, word_length));
 			m_memwrite_1 <= '1';
 			m_memread_1 <= '0';
 		
+			--wait until rising_edge(m_waitrequest);
 			wait until (rising_edge(clk) and (m_waitrequest_1 = '0'));
 			m_memwrite_1 <= '0';
 			m_writedata_1 <= (others => '0');
 			m_address_1 <= (others => '0');
-			P1_done <= '1';
-		end if;
-	end process;
-	
-    test_process : process
-	 
-		variable start				: time := 0 ns;
-		variable finish			: time := 0 ns;
-		
-		variable out_line : line;
-		file out_file : text open write_mode is out_dir & "single_core" & out_ext;
-		
-		procedure reset is
-		begin
-		
-			rst <= '1';
-		
-			m_address_0 <= (others => '0');
-			m_writedata_0 <= (others => '0');
-			m_memwrite_0 <= '0';
-			m_memread_0 <= '0';
-			
-			m_address_1 <= (others => '0');
-			m_writedata_1 <= (others => '0');
-			m_memwrite_1 <= '0';
-			m_memread_1 <= '0';
-			
-			wait for 3*clock_period;
-			wait until rising_edge(clk);
-			rst <= '0';
-		
-		end reset;
-		
-		procedure read_addr(addr : in integer; proc : in std_logic) is
-		begin
-			if (proc = P0) then
-				addr_0 <= addr;
-				m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
-				activate_P0_read <= '1';
-				wait until P0_done = '1';
-				activate_P0_read <= '0';
-			end if;
-			
-			if (proc = P1) then
-				addr_1 <= addr;
-				m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
-				activate_P1_read <= '1';
-				wait until P1_done = '1';
-				activate_P1_read <= '0';
-			end if;
-		end read_addr;
-		
-		procedure write_addr(addr : in integer; writedata : in integer; proc : in std_logic) is
-		begin
-			if (proc = P0) then
-				addr_0 <= addr;
-				writedata_0 <= writedata; 
-				m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
-				activate_P0_write <= '1';
-				wait until P0_done = '1';
-				activate_P0_write <= '0';
-			end if;
-			
-			if (proc = P1) then
-				addr_1 <= addr;
-				writedata_1 <= writedata; 
-				m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
-				activate_P1_write <= '1';
-				wait until P1_done = '1';
-				activate_P1_write <= '0';
-			end if;
 			
 		end write_addr;
 		
-		procedure assert_data(correct_data : in integer; test_data : in integer) is
+		procedure assert_data(correct_data : in integer) is
 		begin
-			assert test_data = correct_data report "Assert Failed" severity Failure;			
+			assert readdata_1 = correct_data report "Assert Failed P1" severity Failure;			
 		end assert_data;
-		
-		procedure write_file(str : in string) is
-		begin
-			write(out_line, str);
-			writeline(out_file, out_line);
-		end write_file;
-		
-		procedure write_time(test : in string) is
-		begin
-			write(out_line, test & " took " & integer'image((finish-start)/clock_period) & " clock cycles");
-			writeline(out_file, out_line);
-		end write_time;
-		
-		procedure basic_tests is
-		begin
-			
-			write_addr(9,9,P0);
-			read_addr(9,P0);
-			assert_data(9);
 
-			write_addr(10,10,P0);
-			read_addr(10,P0);
-			assert_data(10,P0);
+	begin
+	
+		wait until rst = '0';
 
-			for i in 0 to 4095  loop
-				write_addr(i,i,P0);
-			end loop;
-			
-			for i in 0 to 4095  loop
-				read_addr(i,P0);
-				assert_data(i);
-			end loop;
-			
-		end basic_tests;
+		sync_0 <= '0';
 		
+		wait until sync_1 <= '1';
+		
+		read_addr(0);
+		assert_data(21);
+		write_addr(0,19);
+		read_addr(0);
+		assert_data(19);
+		
+		sync_0 <= '1';
+		
+	
+	end process P_1;
 
-		procedure flush_test is
-		begin
-			
-			for i in 0 to (ram_size/2048)-1 loop
-				for j in 0 to 1023  loop
-					read_addr((i*1024)+j,P0);
-				end loop;
-			
-				for j in 0 to 1023  loop
-					write_addr((i*1024)+j,(i*1024)+j,P0);
-				end loop;
-			
-				flush <= '1';
-				wait until rising_edge(clk);
-				flush <= '0';
-			end loop;
-			
-			for i in 0 to (ram_size/2048)-1 loop
-				for j in 0 to 1023  loop
-					read_addr((i*1024)+j,P0);
-					assert_data((i*1024)+j);
-				end loop;	
-			end loop;
-			
-		end flush_test;
-		
-		procedure store_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
-			variable l : line;
-			file f : text open read_mode is in_dir & array_file & in_ext;
-			variable a1 : integer;
-			variable space : character;
-			variable a2 : integer;
-		begin
-			for i in 0 to array_length-1 loop
-				readline(f, l);
-				read(l, a1);
-				read(l, space);
-				read(l, a2);
-				write_addr(start_addr+i,a1,P0);
-				write_addr(start_addr+array_length+i,a2,P0);
-			end loop;
-		end store_arrays;
-		
-		procedure assert_arrays(array_file : in string ; array_length : in integer ; start_addr : in integer) is
-			variable l : line;
-			file f : text open read_mode is in_dir & array_file & in_ext;
-			variable a1 : integer;
-			variable space : character;
-			variable a2 : integer;
-		begin
-			for i in 0 to array_length-1 loop
-				readline(f, l);
-				read(l, a1);
-				read(l, space);
-				read(l, a2);
-				read_addr(start_addr+i,P0);
-				assert_data(a1);
-				read_addr(start_addr+array_length+i,P0);
-				assert_data(a2);
-			end loop;
-		end assert_arrays;
-
-		
-		procedure verify_sum(array_file : in string ; array_length : in integer ; start_addr : in integer) is
-			variable l : line;
-			file f : text open read_mode is in_dir & array_file & result_ext & in_ext;
-			variable r : integer;
-		begin
-			for i in 0 to array_length-1 loop
-				readline(f, l);
-				read(l, r);
-				read_addr(start_addr+array_length+array_length+i,P0);
-				assert_data(r);
-			end loop;
-		end verify_sum;
-		
-		procedure add_arrays_interleaved(array_length : in integer ; start_addr_a : in integer; start_addr_b : in integer; start_addr_c : in integer) is
-			variable a0 : integer;
-			variable a1 : integer;
-			variable b0 : integer;
-			variable b1 : integer;
-			variable c0 : integer;
-			variable c1 : integer;
-			variable i : integer range 0 to array_length;
-			
-		begin
-			i := 0;
-			-- interleaved access: CPU0 accesses block 0, CPU1 block 1, CPU0 block 2, etc.
-			while (i < array_length) loop
-				-- CPU0 and CPU1 access their blocks in parallel
-			read_addr(start_addr_a+i,P0);
-				a0 := readdata_0;
-				read_addr(start_addr_b+i,P0);
-				b0 := readdata_0;
-				
-				read_addr(start_addr_a+i,P1);
-				a1 := readdata_1;
-				read_addr(start_addr_b+i,P1);
-				b1 := readdata_1;
-				
-				-- only start write procedure after both waitrequest0 and waitrequest1 go low
-				write_addr(start_addr_c+i,(a0 + b0),P0);
-				write_addr(start_addr_c+i,(a1 + b1),P1);
-				
-				i := i * words_per_line
-			end loop;
-		end add_arrays_interleaved;
-		
-	 begin
-		
-		reset;
-		
-		--start := now;
-		--basic_tests;
-		--finish := now;
-		
-		--write_time("Basic tests");
-		
-		--start := now;
-		--store_arrays("array1000",1000,100);
-		--finish := now;
-		
-		--write_time("Storing arrays");
-		
-		--start := now;
-		--assert_arrays("array10.in",10,100);
-		--finish := now;
-		
-		--write_time("Verifying arrays");
-		
-		--start := now;
-		--add_arrays(1000,100);
-		--finish := now;
-		
-		--write_time("Adding arrays");
-		
-		--start := now;
-		--verify_sum("array1000",1000,100);
-		--finish := now;
-		
-		--write_time("Verifying sum");
-		
-		start := now;
-		flush_test;
-		finish := now;
-		
-		write_time("Flush test");
-		
-		wait;
-    end process;
- 
 end a0;
