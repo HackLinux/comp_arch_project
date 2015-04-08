@@ -43,9 +43,9 @@ architecture a0 of dual_port_memory is
 				data_out_0		: out std_logic_vector(word_length-1 downto 0);
 				
 				write_en_1		: in	std_logic;
-				address_2		: in  std_logic_vector(r-1 downto 0);
-				data_in_2		: in	std_logic_vector(word_length-1 downto 0);
-				data_out_2		: out std_logic_vector(word_length-1 downto 0)
+				address_1		: in  std_logic_vector(r-1 downto 0);
+				data_in_1		: in	std_logic_vector(word_length-1 downto 0);
+				data_out_1		: out std_logic_vector(word_length-1 downto 0)
 			);
 	end component dual_port_ram;
 
