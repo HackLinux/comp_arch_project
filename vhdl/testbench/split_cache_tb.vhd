@@ -125,6 +125,8 @@ architecture a0 of split_cache_tb is
 	
 	signal readdata_0			: integer := 0;
 	signal readdata_1			: integer := 0;
+	signal writedata_0  : integer := 0;
+	signal writedata_1  : integer := 0; 
 	
 begin
 	 
@@ -132,11 +134,11 @@ begin
 	 xmemory :	memory port map(	clk, rst, 
 											s_writedata_0, s_address_0, s_memwrite_0, s_memread_0, s_readdata_0, s_waitrequest_0);
 											
-   xp0_L1_cache :	single_port_cache port map(clk, rst, flush_0, ready_0, stall_0,
+   p0_L1_cache :	single_port_cache port map(clk, rst, flush_0, ready_0, stall_0,
 																		m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
 																		s_writedata_0,s_address_0,s_memwrite_0,s_memread_0,s_readdata_0,s_waitrequest_0);
 																		
-	 xp1_L1_cache :	single_port_cache port map(clk, rst, flush_1, ready_1, stall_1,
+	 p1_L1_cache :	single_port_cache port map(clk, rst, flush_1, ready_1, stall_1,
 																		m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1,
 																		s_writedata_1,s_address_1,s_memwrite_1,s_memread_1,s_readdata_1,s_waitrequest_1);
     
@@ -148,7 +150,7 @@ begin
        wait for clock_period/2;
    end process;
 	 
-	read_addr_P0: process (activate_P0_read)
+	read_addr_P0: process
 	begin
 		if (activate_P0_read = '1') then
 			P0_done <= '0';
@@ -168,7 +170,7 @@ begin
 		end if;
 	end process;
 		
-	read_addr_P1: process (activate_P1_read)
+	read_addr_P1: process
 	begin
 		if (activate_P1_read = '1') then
 			P1_done <= '0';
@@ -188,12 +190,12 @@ begin
 		end if;
 	end process;
 
-	write_addr_P0: process (activate_P0_write)
+	write_addr_P0: process
 	begin
 		if (activate_P0_write = '1') then
 			P0_done <= '0';
 			m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
-			m_writedata_0 <= std_logic_vector(to_unsigned(writedata, word_length));
+			m_writedata_0 <= std_logic_vector(to_unsigned(writedata_0, word_length));
 			m_memwrite_0 <= '1';
 			m_memread_0 <= '0';
 		
@@ -206,12 +208,12 @@ begin
 		end if;
 	end process;
 		
-	write_addr_P1: process (activate_P1_write)
+	write_addr_P1: process
 	begin
 		if (activate_P1_write = '1') then
 			P1_done <= '0';
 			m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
-			m_writedata_1 <= std_logic_vector(to_unsigned(writedata, word_length));
+			m_writedata_1 <= std_logic_vector(to_unsigned(writedata_1, word_length));
 			m_memwrite_1 <= '1';
 			m_memread_1 <= '0';
 		
@@ -253,7 +255,7 @@ begin
 		
 		end reset;
 		
-		procedure read_addr(addr : in integer; proc : in std_logic)
+		procedure read_addr(addr : in integer; proc : in std_logic) is
 		begin
 			if (proc = P0) then
 				addr_0 <= addr;
@@ -272,10 +274,11 @@ begin
 			end if;
 		end read_addr;
 		
-		procedure write_addr(addr : in integer; writedata : in integer; proc : in processor) is
+		procedure write_addr(addr : in integer; writedata : in integer; proc : in std_logic) is
 		begin
 			if (proc = P0) then
 				addr_0 <= addr;
+				writedata_0 <= writedata; 
 				m_address_0 <= std_logic_vector(to_unsigned(addr_0, r));
 				activate_P0_write <= '1';
 				wait until P0_done = '1';
@@ -284,15 +287,16 @@ begin
 			
 			if (proc = P1) then
 				addr_1 <= addr;
+				writedata_1 <= writedata; 
 				m_address_1 <= std_logic_vector(to_unsigned(addr_1, r));
 				activate_P1_write <= '1';
-				wait until P1_write = '1';
+				wait until P1_done = '1';
 				activate_P1_write <= '0';
 			end if;
 			
 		end write_addr;
 		
-		procedure assert_data(correct_data : in integer, test_data : in integer) is
+		procedure assert_data(correct_data : in integer; test_data : in integer) is
 		begin
 			assert test_data = correct_data report "Assert Failed" severity Failure;			
 		end assert_data;
@@ -312,20 +316,20 @@ begin
 		procedure basic_tests is
 		begin
 			
-			write_addr(9,9);
-			read_addr(9);
+			write_addr(9,9,P0);
+			read_addr(9,P0);
 			assert_data(9);
 
-			write_addr(10,10);
-			read_addr(10);
-			assert_data(10);
+			write_addr(10,10,P0);
+			read_addr(10,P0);
+			assert_data(10,P0);
 
 			for i in 0 to 4095  loop
-				write_addr(i,i);
+				write_addr(i,i,P0);
 			end loop;
 			
 			for i in 0 to 4095  loop
-				read_addr(i);
+				read_addr(i,P0);
 				assert_data(i);
 			end loop;
 			
@@ -337,11 +341,11 @@ begin
 			
 			for i in 0 to (ram_size/2048)-1 loop
 				for j in 0 to 1023  loop
-					read_addr((i*1024)+j);
+					read_addr((i*1024)+j,P0);
 				end loop;
 			
 				for j in 0 to 1023  loop
-					write_addr((i*1024)+j,(i*1024)+j);
+					write_addr((i*1024)+j,(i*1024)+j,P0);
 				end loop;
 			
 				flush <= '1';
@@ -351,7 +355,7 @@ begin
 			
 			for i in 0 to (ram_size/2048)-1 loop
 				for j in 0 to 1023  loop
-					read_addr((i*1024)+j);
+					read_addr((i*1024)+j,P0);
 					assert_data((i*1024)+j);
 				end loop;	
 			end loop;
@@ -370,8 +374,8 @@ begin
 				read(l, a1);
 				read(l, space);
 				read(l, a2);
-				write_addr(start_addr+i,a1);
-				write_addr(start_addr+array_length+i,a2);
+				write_addr(start_addr+i,a1,P0);
+				write_addr(start_addr+array_length+i,a2,P0);
 			end loop;
 		end store_arrays;
 		
@@ -387,25 +391,13 @@ begin
 				read(l, a1);
 				read(l, space);
 				read(l, a2);
-				read_addr(start_addr+i);
+				read_addr(start_addr+i,P0);
 				assert_data(a1);
-				read_addr(start_addr+array_length+i);
+				read_addr(start_addr+array_length+i,P0);
 				assert_data(a2);
 			end loop;
 		end assert_arrays;
 
-		procedure add_arrays(array_length : in integer ; start_addr : in integer) is
-			variable a1 : integer;
-			variable a2 : integer;
-		begin
-			for i in 0 to array_length-1 loop
-				read_addr(start_addr+i);
-				a1 := readdata;
-				read_addr(start_addr+array_length+i);
-				a2 := readdata;
-				write_addr(start_addr+array_length+array_length+i,(a1+a2));
-			end loop;
-		end add_arrays;
 		
 		procedure verify_sum(array_file : in string ; array_length : in integer ; start_addr : in integer) is
 			variable l : line;
@@ -415,7 +407,7 @@ begin
 			for i in 0 to array_length-1 loop
 				readline(f, l);
 				read(l, r);
-				read_addr(start_addr+array_length+array_length+i);
+				read_addr(start_addr+array_length+array_length+i,P0);
 				assert_data(r);
 			end loop;
 		end verify_sum;
