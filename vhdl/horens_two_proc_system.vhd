@@ -92,6 +92,7 @@ architecture a0 of horens_two_proc_system is
 					m_address_local			: in  std_logic_vector(r-1 downto 0);
 					m_memwrite_local			: in  std_logic;
 					m_memread_local			: in  std_logic;
+					m_waitrequest_local		: in  std_logic;
 					
 					m_address_remote			: in  std_logic_vector(r-1 downto 0);
 					m_memwrite_remote			: in  std_logic;
@@ -155,6 +156,9 @@ architecture a0 of horens_two_proc_system is
 				);
 	end component dual_port_memory;
 
+	signal i_m_waitrequest_0				: std_logic;
+	signal i_m_waitrequest_1				: std_logic;
+	
 	signal s_writedata_0						: std_logic_vector (word_length-1 downto 0);
 	signal s_address_0						: std_logic_vector(r-1 downto 0);
 	signal s_memwrite_0						: std_logic;
@@ -241,7 +245,7 @@ begin
 
 	
 	L1_cache_controller_0 : horens_cache_set_controller port map(	clk, rst, flush_0, ready_0,
-																						m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
+																						m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, i_m_waitrequest_0,
 																						s_writedata_0, s_address_0, s_memwrite_0, s_memread_0, s_readdata_0, s_waitrequest_0,
 																						cache_addr_0, cache_ctrl_write_0, cache_word_write_0,
 																						ctrl_writedata_0, word_writedata_0, ctrl_readdata_0, word_readdata_0,
@@ -249,7 +253,7 @@ begin
 																						
 																						
 	L1_cache_controller_1 : horens_cache_set_controller port map(	clk, rst, flush_1, ready_1,
-																						m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1,
+																						m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, i_m_waitrequest_1,
 																						s_writedata_1, s_address_1, s_memwrite_1, s_memread_1, s_readdata_1, s_waitrequest_1,
 																						cache_addr_1, cache_ctrl_write_1, cache_word_write_1,
 																						ctrl_writedata_1, word_writedata_1, ctrl_readdata_1, word_readdata_1,
@@ -257,7 +261,7 @@ begin
 	
 
 	L1_coherency_circuit_0 : horens_clean_coherency_circuit port map(	clk, rst,
-																							m_address_0, m_memwrite_0, m_memread_0,
+																							m_address_0, m_memwrite_0, m_memread_0, i_m_waitrequest_0,
 																							m_address_1, m_memwrite_1, m_memread_1,
 																							c_stall_0, c_blast_0, c_dirty_0, c_word_0, c_hit_0, c_empty_0,
 																							cache_addr_remote_1, cache_ctrl_write_remote_1, ctrl_writedata_remote_1,
@@ -265,10 +269,13 @@ begin
 
 
 	L1_coherency_circuit_1 : horens_clean_coherency_circuit port map(	clk, rst,
-																							m_address_1, m_memwrite_1, m_memread_1,
+																							m_address_1, m_memwrite_1, m_memread_1, i_m_waitrequest_1,
 																							m_address_0, m_memwrite_0, m_memread_0,
 																							c_stall_1, c_blast_1, c_dirty_1, c_word_1, c_hit_1, c_empty_1,
 																							cache_addr_remote_0, cache_ctrl_write_remote_0, ctrl_writedata_remote_0,
 																							ctrl_readdata_remote_0, word_readdata_remote_0);
+																							
+	m_waitrequest_0 <= i_m_waitrequest_0;
+	m_waitrequest_1 <= i_m_waitrequest_1;
 
 end a0;			

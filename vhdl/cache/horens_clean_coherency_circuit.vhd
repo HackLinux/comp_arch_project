@@ -19,6 +19,7 @@ entity horens_clean_coherency_circuit is
 				m_address_local			: in  std_logic_vector(r-1 downto 0);
 				m_memwrite_local			: in  std_logic;
 				m_memread_local			: in  std_logic;
+				m_waitrequest_local		: in  std_logic;
 				
 				m_address_remote			: in  std_logic_vector(r-1 downto 0);
 				m_memwrite_remote			: in  std_logic;
@@ -76,7 +77,7 @@ begin
 			if(rst = '1') then
 				blast_offset  <= (others => '0');
 			elsif(rising_edge(clk)) then
-				if(current = blast) then
+				if((current = blast) or ((current = idle) and (((m_memread_local xor m_memwrite_local) and hit_remote and (not c_hit_in) and c_empty_in) = '1'))) then
 					blast_offset <= blast_offset + 1;
 				else
 					blast_offset  <= (others => '0');
@@ -122,7 +123,11 @@ begin
 					end if;
 				
 				when proceed =>
-					current <= idle;
+					if(m_waitrequest_local = '0') then
+						current <= idle;
+					else
+						current <= proceed;
+					end if;
 				
 			end case;
 		
@@ -174,7 +179,7 @@ begin
 	end process;
 	
 	output_assignments:
-	process(current, hit_remote, c_hit_in)
+	process(current, m_memread_local, m_memwrite_local, hit_remote, c_hit_in)
 	begin
 		case current is
 			when reset =>
