@@ -16,6 +16,8 @@ entity horens_clean_coherency_circuit is
 	port	(	clk							: in  std_logic;
 				rst							: in  std_logic;
 				
+				last_used					: in  std_logic;
+				
 				m_address_local			: in  std_logic_vector(r-1 downto 0);
 				m_memwrite_local			: in  std_logic;
 				m_memread_local			: in  std_logic;
@@ -97,10 +99,12 @@ begin
 					current  <= idle;
 					
 				when idle =>
-					if((unsigned(m_address_local(r-1 downto l)) = unsigned(m_address_remote(r-1 downto l))) and ((m_memwrite_remote or (m_memwrite_local and m_memread_remote)) = '1')) then
+					if((unsigned(m_address_local(r-1 downto 0)) = unsigned(m_address_remote(r-1 downto 0))) and ((m_memwrite_remote or (m_memwrite_local and m_memread_remote)) = '1')) then
 						current <= idle;
 					elsif((m_memread_local xor m_memwrite_local) = '1') then
-						if(hit_remote = '1') then
+						if((unsigned(m_address_local(r-1 downto l)) = unsigned(m_address_remote(r-1 downto l))) and ((m_memwrite_remote xor m_memread_remote) = '1') and (last_used = '1')) then
+							current <= idle;
+						elsif(hit_remote = '1') then
 							if(c_hit_in = '1') then
 								current <= proceed;
 							elsif(c_empty_in = '1') then
@@ -116,8 +120,8 @@ begin
 					end if;
 				
 				when blast =>
-					if(blast_offset = words_per_line-1) then
-						current <= idle;
+					if(blast_offset = 0) then
+						current <= proceed;
 					else
 						current <= blast;
 					end if;

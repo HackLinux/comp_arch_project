@@ -1,0 +1,76 @@
+Beginning 10 element array addition test (chunks)
+
+Storing arrays took 140 clock cycles
+Verifying arrays took 236 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 261 clock cycles
+Verifying the sum took 77 clock cycles
+Finishing 10 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 33 clock cycles
+
+
+Beginning 10 element array addition test (interleaved)
+
+Storing arrays took 140 clock cycles
+Verifying arrays took 295 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 355 clock cycles
+Verifying the sum took 174 clock cycles
+Finishing 1000 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 33 clock cycles
+
+
+Beginning 1000 element array addition test (chunks)
+
+Storing arrays took 14000 clock cycles
+Verifying arrays took 16250 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 23250 clock cycles
+Verifying the sum took 8125 clock cycles
+Finishing 1000 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 33 clock cycles
+
+
+Beginning 1000 element array addition test (interleaved)
+
+Storing arrays took 14014 clock cycles
+Verifying arrays took 28749 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 35501 clock cycles
+Verifying the sum took 14750 clock cycles
+Finishing 100000 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 33 clock cycles
+
+
+Beginning 100000 element array addition test (chunks)
+
+Storing arrays took 1400000 clock cycles
+Verifying arrays took 1625000 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 2325000 clock cycles
+Verifying the sum took 765180 clock cycles
+Finishing 100000 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 33 clock cycles
+
+
+Beginning 100000 element array addition test (interleaved)
+
+Storing arrays took 1400000 clock cycles
+Verifying arrays took 2875008 clock cycles
+Flushing the cache took 33 clock cycles
+Adding arrays took 3322888 clock cycles

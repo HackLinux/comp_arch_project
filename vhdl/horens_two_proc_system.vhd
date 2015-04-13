@@ -89,6 +89,8 @@ architecture a0 of horens_two_proc_system is
 		port	(	clk							: in  std_logic;
 					rst							: in  std_logic;
 					
+					last_used					: in  std_logic;
+					
 					m_address_local			: in  std_logic_vector(r-1 downto 0);
 					m_memwrite_local			: in  std_logic;
 					m_memread_local			: in  std_logic;
@@ -215,6 +217,10 @@ architecture a0 of horens_two_proc_system is
 	signal c_hit_1								: std_logic;
 	signal c_empty_1							: std_logic;
 	
+	signal last_used							: std_logic;
+	signal last_used_0						: std_logic;
+	signal last_used_1						: std_logic;
+	
 begin
 
 	
@@ -260,7 +266,7 @@ begin
 																						c_stall_1, c_blast_1, c_dirty_1, c_word_1, c_hit_1, c_empty_1);
 	
 
-	L1_coherency_circuit_0 : horens_clean_coherency_circuit port map(	clk, rst,
+	L1_coherency_circuit_0 : horens_clean_coherency_circuit port map(	clk, rst, last_used_0,
 																							m_address_0, m_memwrite_0, m_memread_0, i_m_waitrequest_0,
 																							m_address_1, m_memwrite_1, m_memread_1,
 																							c_stall_0, c_blast_0, c_dirty_0, c_word_0, c_hit_0, c_empty_0,
@@ -268,7 +274,7 @@ begin
 																							ctrl_readdata_remote_1, word_readdata_remote_1);
 
 
-	L1_coherency_circuit_1 : horens_clean_coherency_circuit port map(	clk, rst,
+	L1_coherency_circuit_1 : horens_clean_coherency_circuit port map(	clk, rst, last_used_1,
 																							m_address_1, m_memwrite_1, m_memread_1, i_m_waitrequest_1,
 																							m_address_0, m_memwrite_0, m_memread_0,
 																							c_stall_1, c_blast_1, c_dirty_1, c_word_1, c_hit_1, c_empty_1,
@@ -277,5 +283,26 @@ begin
 																							
 	m_waitrequest_0 <= i_m_waitrequest_0;
 	m_waitrequest_1 <= i_m_waitrequest_1;
+	last_used_0 <= not last_used;
+	last_used_1 <= last_used;
+	
+	process(clk, rst)
+	begin
+		if(rst = '1') then
+			last_used <= '0';
+		elsif(rising_edge(clk)) then
+			if((unsigned(m_address_0(r-1 downto l)) = unsigned(m_address_1(r-1 downto l))) and ((m_memread_0 xor m_memwrite_0) and (m_memread_0 xor m_memwrite_0)) = '1') then
+				if(last_used = '0') then
+					if(i_m_waitrequest_1 = '0') then
+						last_used <= '1';
+					end if;
+				else
+					if(i_m_waitrequest_0 = '0') then
+						last_used <= '0';
+					end if;
+				end if;
+			end if;
+		end if;
+	end process;
 
 end a0;			

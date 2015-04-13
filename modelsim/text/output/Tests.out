@@ -1,0 +1,22 @@
+Beginning 10 element array addition test (chunks)
+
+10 element array addition test (chunks) took 747 clock cycles
+
+Beginning 10 element array addition test (interleaved)
+
+10 element array addition test (interleaved) took 1000 clock cycles
+
+Beginning 1000 element array addition test (chunks)
+
+1000 element array addition test (chunks) took 61658 clock cycles
+
+Beginning 1000 element array addition test (interleaved)
+
+1000 element array addition test (interleaved) took 93047 clock cycles
+
+Beginning 100000 element array addition test (chunks)
+
+100000 element array addition test (chunks) took 6162533 clock cycles
+
+Beginning 100000 element array addition test (interleaved)
+

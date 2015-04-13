@@ -206,11 +206,7 @@ begin
 				word_number_reg <= (others => '0');
 			elsif(rising_edge(clk)) then
 				if(s_waitrequest = '0' and current /= mem_write) then
-					--if(word_number = words_per_line-1) then
-						--word_number <= (others => '0');
-					--else
 						word_number <= word_number + 1;
-					--end if;
 				end if;
 				
 				-- double register the word number
@@ -501,14 +497,18 @@ begin
 				ctrl_write_KO(i) <= '0';
 			end if;
 			
-			if(i = dirty_index) then
-				if(word_number = words_per_line-1) then
-					ctrl_write_flush(i) <= not s_waitrequest;
+			if(dirty = '1') then
+				if(i = dirty_index) then
+					if(word_number = words_per_line-1) then
+						ctrl_write_flush(i) <= not s_waitrequest;
+					else
+						ctrl_write_flush(i) <= '0';
+					end if;
 				else
 					ctrl_write_flush(i) <= '0';
 				end if;
 			else
-				ctrl_write_flush(i) <= '0';
+				ctrl_write_flush(i) <= '1';
 			end if;
 		
 		end loop;
