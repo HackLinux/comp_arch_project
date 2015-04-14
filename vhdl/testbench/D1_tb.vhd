@@ -23,16 +23,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_textio.all;
 use ieee.numeric_std.all;
 use work.params.all;
-use work.params_L1.all;
 
-entity split_cache_tb is
-end split_cache_tb;
+entity D1_tb is
+end D1_tb;
 
-architecture a0 of split_cache_tb is
+architecture a0 of D1_tb is
 
 --Declare the component that you are testing:
-
-	component horens_two_proc_system is
+	
+	component D1_dual_proc_system_wna is
 		port	(	clk		: in  std_logic;
 					rst		: in  std_logic;
 					
@@ -56,7 +55,7 @@ architecture a0 of split_cache_tb is
 					m_readdata_1		: out std_logic_vector (word_length-1 downto 0);
 					m_waitrequest_1	: out std_logic			
 				);
-	end component horens_two_proc_system;
+	end component D1_dual_proc_system_wna;
 
     --all the input signals with initial values
 	signal clk					: std_logic := '0';
@@ -64,7 +63,7 @@ architecture a0 of split_cache_tb is
 	
 
 	signal flush_0				: std_logic	:= '0';
-	signal ready_0				: std_logic := '0';	
+	signal ready_0				: std_logic := '0';
 	signal m_writedata_0		: std_logic_vector (word_length-1 downto 0) := (others => '0');
 	signal m_address_0		: std_logic_vector(r-1 downto 0) := (others => '0');
 	signal m_memwrite_0		: std_logic := '0';
@@ -104,11 +103,11 @@ architecture a0 of split_cache_tb is
 	
 begin
 	
-	xhtps : horens_two_proc_system port map(	clk, rst,
-															flush_0, ready_0,
-															m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
-															flush_1, ready_1,
-															m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1);
+	xhtps : D1_dual_proc_system_wna port map(	clk, rst,
+																		flush_0, ready_0,
+																		m_writedata_0, m_address_0, m_memwrite_0, m_memread_0, m_readdata_0, m_waitrequest_0,
+																		flush_1, ready_1,
+																		m_writedata_1, m_address_1, m_memwrite_1, m_memread_1, m_readdata_1, m_waitrequest_1);
 	
 	clk_process : process
 
@@ -138,7 +137,7 @@ begin
 		variable readdata_0		: integer := 0;
 		
 		variable out_line : line;
-		file out_file : text open write_mode is out_dir & "P0" & out_ext;
+		file out_file : text open write_mode is out_dir & "P0_D1" & out_ext;
 		
 	
 		-- P0 reads the value stored at 'addr' into variable 'readdata_0'
@@ -178,7 +177,7 @@ begin
 		-- P0 checks whether the data stored in 'readdata_0' is equal to 'correct_data'
 		procedure assert_data(correct_data : in integer) is
 		begin
-			assert readdata_0 = correct_data report "Assert Failed P0" severity Failure;			
+			assert readdata_0 = correct_data report "Assert Failed P0" severity Error;			
 		end assert_data;
 		
 		-- flush the cache of P0
@@ -188,7 +187,7 @@ begin
 			wait for clock_period;
 			wait until rising_edge(clk);
 			flush_0 <= '0';
-			wait until rising_edge(ready_0);
+			wait until rising_edge(ready_0);	
 		end flush;
 		
 		-- P0 writes a string 'str' to its output file './text/output/P0.out'
@@ -318,18 +317,6 @@ begin
 			finish := now;
 			
 			write_time("Storing arrays");
-			
-			start := now;
-			assert_arrays;
-			finish := now;
-			
-			write_time("Verifying arrays");
-			
-			start := now;
-			flush;
-			finish := now;
-			
-			write_time("Flushing the cache");
 		
 			start := now;
 			add_arrays;
@@ -396,7 +383,7 @@ begin
 		variable readdata_1		: integer := 0;
 		
 		variable out_line : line;
-		file out_file : text open write_mode is out_dir & "P1" & out_ext;
+		file out_file : text open write_mode is out_dir & "P1_D1" & out_ext;
 		
 	
 		-- P1 reads the value stored at 'addr' into variable 'readdata_1'
@@ -436,7 +423,7 @@ begin
 		-- P1 checks whether the data stored in 'readdata_1' is equal to 'correct_data'
 		procedure assert_data(correct_data : in integer) is
 		begin
-			assert readdata_1 = correct_data report "Assert Failed P1" severity Failure;			
+			assert readdata_1 = correct_data report "Assert Failed P1" severity Error;			
 		end assert_data;
 		
 		-- flush the cache of P1
@@ -576,18 +563,6 @@ begin
 			finish := now;
 			
 			write_time("Storing arrays");
-			
-			start := now;
-			assert_arrays;
-			finish := now;
-			
-			write_time("Verifying arrays");
-			
-			start := now;
-			flush;
-			finish := now;
-			
-			write_time("Flushing the cache");
 		
 			start := now;
 			add_arrays;
@@ -609,18 +584,6 @@ begin
 			else
 				write_file("Finishing " & integer'image(array_length) & " element array addition test (interleaved)");
 			end if;
-
-			write_file("");
-			write_file("");
-			write_file("Flushing the cache");
-			
-			start := now;
-			flush;
-			finish := now;
-			
-			write_time("Flushing the cache");
-			write_file("");
-			write_file("");
 			
 			P1_done <= '0';
 		
@@ -652,7 +615,7 @@ begin
 		variable finish			: time := 0 ns;
 		
 		variable out_line : line;
-		file out_file : text open write_mode is out_dir & "Tests" & out_ext;
+		file out_file : text open write_mode is out_dir & "Tests_D1" & out_ext;
 		
 		procedure write_file(str : in string) is
 		begin
@@ -722,9 +685,26 @@ begin
 		array_test <= '1';
 		
 		add_arrays(10, 0, 0);
-		add_arrays(10, 0, 1);
+		add_arrays(50, 0, 0);
+		add_arrays(100, 0, 0);
+		add_arrays(500, 0, 0);
 		add_arrays(1000, 0, 0);
+		add_arrays(1500, 0, 0);
+		add_arrays(2500, 0, 0);
+		add_arrays(5000, 0, 0);
+		add_arrays(7500, 0, 0);
+		add_arrays(10000, 0, 0);
+		
+		add_arrays(10, 0, 1);
+		add_arrays(50, 0, 1);
+		add_arrays(100, 0, 1);
+		add_arrays(500, 0, 1);
 		add_arrays(1000, 0, 1);
+		add_arrays(1500, 0, 1);
+		add_arrays(2500, 0, 1);
+		add_arrays(5000, 0, 1);
+		add_arrays(7500, 0, 1);
+		add_arrays(10000, 0, 1);
 
 		array_test <= '0';
 		

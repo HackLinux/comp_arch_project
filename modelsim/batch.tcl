@@ -35,6 +35,12 @@ proc r  {tb} {
     run -all
     echo "---------------FINISHED RUNNING--------------------------"
 }
+
+proc rn	{} {
+ set newpath ""
+ set item ""
+ file rename -force $item $newpath
+}
 proc q  {} {
  quit -sim
 }

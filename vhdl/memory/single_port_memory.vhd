@@ -45,12 +45,9 @@ architecture a0 of single_port_memory is
 		
 	signal mem_delay		: integer;
 	signal delay_rst		: std_logic;
-	signal delay_done		: std_logic;
 	
 begin
-	
-	delay_done <= '1' when mem_delay = mem_delay_cycles else '0';
-	
+		
 	process(clk, rst)
 	begin
 		if(rst = '1') then

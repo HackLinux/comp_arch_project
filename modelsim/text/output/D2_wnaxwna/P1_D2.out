@@ -1,0 +1,119 @@
+Beginning 10 element array addition test (chunks)
+
+Storing arrays took 150 clock cycles
+Adding arrays took 293 clock cycles
+Verifying the sum took 141 clock cycles
+Finishing 50 element array addition test (chunks)
+Beginning 50 element array addition test (chunks)
+
+Storing arrays took 666 clock cycles
+Adding arrays took 1221 clock cycles
+Verifying the sum took 506 clock cycles
+Finishing 100 element array addition test (chunks)
+Beginning 100 element array addition test (chunks)
+
+Storing arrays took 1072 clock cycles
+Adding arrays took 2542 clock cycles
+Verifying the sum took 954 clock cycles
+Finishing 500 element array addition test (chunks)
+Beginning 500 element array addition test (chunks)
+
+Storing arrays took 7020 clock cycles
+Adding arrays took 12813 clock cycles
+Verifying the sum took 4654 clock cycles
+Finishing 1000 element array addition test (chunks)
+Beginning 1000 element array addition test (chunks)
+
+Storing arrays took 12408 clock cycles
+Adding arrays took 22886 clock cycles
+Verifying the sum took 9268 clock cycles
+Finishing 1500 element array addition test (chunks)
+Beginning 1500 element array addition test (chunks)
+
+Storing arrays took 15492 clock cycles
+Adding arrays took 30905 clock cycles
+Verifying the sum took 14093 clock cycles
+Finishing 2500 element array addition test (chunks)
+Beginning 2500 element array addition test (chunks)
+
+Storing arrays took 36972 clock cycles
+Adding arrays took 64420 clock cycles
+Verifying the sum took 23154 clock cycles
+Finishing 5000 element array addition test (chunks)
+Beginning 5000 element array addition test (chunks)
+
+Storing arrays took 75000 clock cycles
+Adding arrays took 130000 clock cycles
+Verifying the sum took 46250 clock cycles
+Finishing 7500 element array addition test (chunks)
+Beginning 7500 element array addition test (chunks)
+
+Storing arrays took 112500 clock cycles
+Adding arrays took 195058 clock cycles
+Verifying the sum took 69404 clock cycles
+Finishing 10000 element array addition test (chunks)
+Beginning 10000 element array addition test (chunks)
+
+Storing arrays took 150000 clock cycles
+Adding arrays took 260000 clock cycles
+Verifying the sum took 92500 clock cycles
+Finishing 10 element array addition test (interleaved)
+Beginning 10 element array addition test (interleaved)
+
+Storing arrays took 150 clock cycles
+Adding arrays took 405 clock cycles
+Verifying the sum took 210 clock cycles
+Finishing 50 element array addition test (interleaved)
+Beginning 50 element array addition test (interleaved)
+
+Storing arrays took 628 clock cycles
+Adding arrays took 1563 clock cycles
+Verifying the sum took 885 clock cycles
+Finishing 100 element array addition test (interleaved)
+Beginning 100 element array addition test (interleaved)
+
+Storing arrays took 1412 clock cycles
+Adding arrays took 3819 clock cycles
+Verifying the sum took 1700 clock cycles
+Finishing 500 element array addition test (interleaved)
+Beginning 500 element array addition test (interleaved)
+
+Storing arrays took 7500 clock cycles
+Adding arrays took 21125 clock cycles
+Verifying the sum took 8512 clock cycles
+Finishing 1000 element array addition test (interleaved)
+Beginning 1000 element array addition test (interleaved)
+
+Storing arrays took 15015 clock cycles
+Adding arrays took 42250 clock cycles
+Verifying the sum took 17000 clock cycles
+Finishing 1500 element array addition test (interleaved)
+Beginning 1500 element array addition test (interleaved)
+
+Storing arrays took 22500 clock cycles
+Adding arrays took 63375 clock cycles
+Verifying the sum took 25512 clock cycles
+Finishing 2500 element array addition test (interleaved)
+Beginning 2500 element array addition test (interleaved)
+
+Storing arrays took 37515 clock cycles
+Adding arrays took 105625 clock cycles
+Verifying the sum took 42500 clock cycles
+Finishing 5000 element array addition test (interleaved)
+Beginning 5000 element array addition test (interleaved)
+
+Storing arrays took 75000 clock cycles
+Adding arrays took 211250 clock cycles
+Verifying the sum took 85012 clock cycles
+Finishing 7500 element array addition test (interleaved)
+Beginning 7500 element array addition test (interleaved)
+
+Storing arrays took 112515 clock cycles
+Adding arrays took 316875 clock cycles
+Verifying the sum took 127500 clock cycles
+Finishing 10000 element array addition test (interleaved)
+Beginning 10000 element array addition test (interleaved)
+
+Storing arrays took 150000 clock cycles
+Adding arrays took 422500 clock cycles
+Verifying the sum took 170012 clock cycles
