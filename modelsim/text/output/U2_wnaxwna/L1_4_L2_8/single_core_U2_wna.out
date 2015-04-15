@@ -1,0 +1,10 @@
+10 element addition took 1230 clock cycles
+50 element addition took 4754 clock cycles
+100 element addition took 9450 clock cycles
+500 element addition took 47250 clock cycles
+1000 element addition took 94500 clock cycles
+1500 element addition took 141750 clock cycles
+2500 element addition took 236250 clock cycles
+5000 element addition took 472500 clock cycles
+7500 element addition took 708750 clock cycles
+10000 element addition took 945000 clock cycles

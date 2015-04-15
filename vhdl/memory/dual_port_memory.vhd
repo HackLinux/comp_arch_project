@@ -58,7 +58,6 @@ architecture a0 of dual_port_memory is
 	
 	signal mem_delay_0	: integer;
 	signal delay_rst_0	: std_logic;
-	signal delay_done_0	: std_logic;
 	
 	
 	signal current_1	: state := reset;
@@ -67,7 +66,6 @@ architecture a0 of dual_port_memory is
 	
 	signal mem_delay_1	: integer;
 	signal delay_rst_1	: std_logic;
-	signal delay_done_1	: std_logic;
 	
 begin
 
@@ -161,10 +159,7 @@ begin
 	-------------------------
 	-- COMBINATIONAL LOGIC --
 	-------------------------
-	
-	delay_done_0 <= '1' when mem_delay_0 = mem_delay_cycles else '0';	
-	delay_done_1 <= '1' when mem_delay_1 = mem_delay_cycles else '0';
-	
+
 	output_assignments_0:
 	process(current_0, s_writedata_0, s_address_0, mem_delay_0, s_memwrite_0)
 	begin

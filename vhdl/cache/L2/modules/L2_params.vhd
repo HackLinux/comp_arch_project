@@ -37,7 +37,7 @@ package body L2_params is
 	constant c : integer := 15 ;	-- 4 kB cache				-- DEPENDENCIES : the size of cache is a design decision
 	
 	constant l : integer := 2 ;	-- 4 words per line		-- DEPENDENCIES : l = c-w-a-s
-	constant a : integer := 3 ;	-- 8-way associative		-- DEPENDENCIES : a = c-w-l-s
+	constant a : integer := 0 ;	-- 8-way associative		-- DEPENDENCIES : a = c-w-l-s
 	constant s : integer := c-w-l-a;								-- DEPENDENCIES : s = c-w-l-a
 	constant t : integer := r-s-l;								-- DEPENDENCIES : t = r-s-l
 	

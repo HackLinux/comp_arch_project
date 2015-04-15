@@ -117,7 +117,7 @@ begin
 		
 end modelsim;
 
---architecture quartus of dual_port_cache_set is 
+--architecture quartus of L2_dual_port_cache_set is 
 --
 --	type cache_ctrl is array (lines_per_set-1 downto 0) of std_logic_vector(ctrl_length-1 downto 0);
 --

@@ -1,0 +1,233 @@
+Beginning 10 element array addition test (chunks)
+
+Storing arrays took 150 clock cycles
+Adding arrays took 239 clock cycles
+Verifying the sum took 122 clock cycles
+Finishing 50 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 50 element array addition test (chunks)
+
+Storing arrays took 566 clock cycles
+Adding arrays took 1043 clock cycles
+Verifying the sum took 452 clock cycles
+Finishing 100 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 100 element array addition test (chunks)
+
+Storing arrays took 1446 clock cycles
+Adding arrays took 1826 clock cycles
+Verifying the sum took 896 clock cycles
+Finishing 500 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 500 element array addition test (chunks)
+
+Storing arrays took 7381 clock cycles
+Adding arrays took 11608 clock cycles
+Verifying the sum took 5944 clock cycles
+Finishing 1000 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 1000 element array addition test (chunks)
+
+Storing arrays took 15120 clock cycles
+Adding arrays took 26000 clock cycles
+Verifying the sum took 9250 clock cycles
+Finishing 1500 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 1500 element array addition test (chunks)
+
+Storing arrays took 22196 clock cycles
+Adding arrays took 38952 clock cycles
+Verifying the sum took 13846 clock cycles
+Finishing 2500 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2097 clock cycles
+
+
+Beginning 2500 element array addition test (chunks)
+
+Storing arrays took 37567 clock cycles
+Adding arrays took 64948 clock cycles
+Verifying the sum took 23117 clock cycles
+Finishing 5000 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2145 clock cycles
+
+
+Beginning 5000 element array addition test (chunks)
+
+Storing arrays took 75000 clock cycles
+Adding arrays took 130000 clock cycles
+Verifying the sum took 46250 clock cycles
+Finishing 7500 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 7500 element array addition test (chunks)
+
+Storing arrays took 112500 clock cycles
+Adding arrays took 195058 clock cycles
+Verifying the sum took 69355 clock cycles
+Finishing 10000 element array addition test (chunks)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 10000 element array addition test (chunks)
+
+Storing arrays took 150000 clock cycles
+Adding arrays took 260000 clock cycles
+Verifying the sum took 92500 clock cycles
+Finishing 10 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 10 element array addition test (interleaved)
+
+Storing arrays took 150 clock cycles
+Adding arrays took 405 clock cycles
+Verifying the sum took 210 clock cycles
+Finishing 50 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 50 element array addition test (interleaved)
+
+Storing arrays took 701 clock cycles
+Adding arrays took 1619 clock cycles
+Verifying the sum took 888 clock cycles
+Finishing 100 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 100 element array addition test (interleaved)
+
+Storing arrays took 1390 clock cycles
+Adding arrays took 1949 clock cycles
+Verifying the sum took 1712 clock cycles
+Finishing 500 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 500 element array addition test (interleaved)
+
+Storing arrays took 8222 clock cycles
+Adding arrays took 16770 clock cycles
+Verifying the sum took 8512 clock cycles
+Finishing 1000 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 1000 element array addition test (interleaved)
+
+Storing arrays took 12435 clock cycles
+Adding arrays took 40021 clock cycles
+Verifying the sum took 17292 clock cycles
+Finishing 1500 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 1500 element array addition test (interleaved)
+
+Storing arrays took 22371 clock cycles
+Adding arrays took 63375 clock cycles
+Verifying the sum took 25500 clock cycles
+Finishing 2500 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 2500 element array addition test (interleaved)
+
+Storing arrays took 37500 clock cycles
+Adding arrays took 105625 clock cycles
+Verifying the sum took 42512 clock cycles
+Finishing 5000 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 5000 element array addition test (interleaved)
+
+Storing arrays took 75015 clock cycles
+Adding arrays took 211250 clock cycles
+Verifying the sum took 85000 clock cycles
+Finishing 7500 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 7500 element array addition test (interleaved)
+
+Storing arrays took 112500 clock cycles
+Adding arrays took 316875 clock cycles
+Verifying the sum took 127512 clock cycles
+Finishing 10000 element array addition test (interleaved)
+
+
+Flushing the cache
+Flushing the cache took 2049 clock cycles
+
+
+Beginning 10000 element array addition test (interleaved)
+
+Storing arrays took 150015 clock cycles
+Adding arrays took 422500 clock cycles
+Verifying the sum took 170000 clock cycles

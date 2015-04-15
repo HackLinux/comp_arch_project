@@ -290,6 +290,6 @@ begin
 		addition(10000);
 		
 		wait;
-    end process;
+    end process test_process;
  
 end a0;
